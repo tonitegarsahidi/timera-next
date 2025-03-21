@@ -39,7 +39,7 @@ export default function LandingPage() {
             <div className="md:w-1/2">
               <div className="relative rounded-lg overflow-hidden shadow-2xl">
                 <Image
-                  src="/placeholder.svg?height=600&width=800"
+                  src="/jadwal sholat digital - timer iqomah - timer adzan - timer masjid - TIMERA.jpg?height=600&width=800"
                   alt="Timera Preview"
                   width={600}
                   height={400}
