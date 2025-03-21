@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
-import { Clock, Timer, Monitor, Smartphone, Settings, ArrowRight, CheckCircle2 } from "lucide-react"
+import { Clock, Timer, Monitor, Smartphone, Settings, ArrowRight, CheckCircle2, Laptop } from "lucide-react"
 
 export default function LandingPage() {
   return (
@@ -67,38 +67,38 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="border-none shadow-lg hover:shadow-xl transition-shadow">
+            <Card className="border-none shadow-md hover:shadow-lg transition-shadow bg-white">
               <CardContent className="p-6">
                 <div className="rounded-full bg-emerald-100 w-14 h-14 flex items-center justify-center mb-4">
                   <Clock className="h-7 w-7 text-emerald-600" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">Jadwal Sholat Akurat</h3>
-                <p className="text-gray-600">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">Jadwal Sholat Akurat</h3>
+                <p className="text-gray-700">
                   Tampilkan jadwal sholat yang akurat berdasarkan lokasi masjid Anda dengan penyesuaian waktu yang
                   fleksibel.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-none shadow-lg hover:shadow-xl transition-shadow">
+            <Card className="border-none shadow-md hover:shadow-lg transition-shadow bg-white">
               <CardContent className="p-6">
                 <div className="rounded-full bg-emerald-100 w-14 h-14 flex items-center justify-center mb-4">
                   <Timer className="h-7 w-7 text-emerald-600" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">Timer Iqomah</h3>
-                <p className="text-gray-600">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">Timer Iqomah</h3>
+                <p className="text-gray-700">
                   Atur durasi iqomah untuk setiap waktu sholat dan tampilkan countdown yang jelas untuk jamaah.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-none shadow-lg hover:shadow-xl transition-shadow">
+            <Card className="border-none shadow-md hover:shadow-lg transition-shadow bg-white">
               <CardContent className="p-6">
                 <div className="rounded-full bg-emerald-100 w-14 h-14 flex items-center justify-center mb-4">
                   <Settings className="h-7 w-7 text-emerald-600" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">Kustomisasi Penuh</h3>
-                <p className="text-gray-600">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">Kustomisasi Penuh</h3>
+                <p className="text-gray-700">
                   Sesuaikan tampilan dengan logo masjid, warna, font, dan background sesuai keinginan Anda.
                 </p>
               </CardContent>
@@ -158,26 +158,26 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <Card className="border-none shadow-lg">
+            <Card className="border-none shadow-md bg-white">
+              <CardContent className="p-6 flex items-center">
+                <div className="rounded-full bg-emerald-100 w-14 h-14 flex items-center justify-center mr-4">
+                  <Laptop className="h-7 w-7 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-1 text-gray-900">Semua Browser</h3>
+                  <p className="text-gray-700">Buka browser di manapun (PC/laptop/tablet/TV Android) dan akses Timera langsung</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-none shadow-md bg-white">
               <CardContent className="p-6 flex items-center">
                 <div className="rounded-full bg-emerald-100 w-14 h-14 flex items-center justify-center mr-4">
                   <Monitor className="h-7 w-7 text-emerald-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-1">TV Android</h3>
-                  <p className="text-gray-600">Buka browser di TV Android dan akses Timera langsung</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-none shadow-lg">
-              <CardContent className="p-6 flex items-center">
-                <div className="rounded-full bg-emerald-100 w-14 h-14 flex items-center justify-center mr-4">
-                  <Smartphone className="h-7 w-7 text-emerald-600" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-1">STB Android</h3>
-                  <p className="text-gray-600">Gunakan Set-Top Box Android yang terhubung ke TV biasa</p>
+                  <h3 className="text-xl font-bold mb-1 text-gray-900">TV / STB Android</h3>
+                  <p className="text-gray-700">Gunakan Set-Top Box Android yang terhubung ke TV biasa</p>
                 </div>
               </CardContent>
             </Card>
@@ -269,8 +269,11 @@ export default function LandingPage() {
               <Link href="#fitur" className="text-gray-300 hover:text-white">
                 Fitur
               </Link>
-              <Link href="#" className="text-gray-300 hover:text-white">
-                Bantuan
+              <Link href="/term-of-service" className="text-gray-300 hover:text-white">
+                Terms Of Service
+              </Link>
+              <Link href="/privacy-policy" className="text-gray-300 hover:text-white">
+                Privacy Policy
               </Link>
             </div>
           </div>
