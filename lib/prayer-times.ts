@@ -54,7 +54,7 @@ const DEFAULT_SETTINGS: PrayerSettings = {
     Maghrib: 5,
     Isha: 5,
   },
-  mosqueName: "Masjid Al-Ikhlas",
+  mosqueName: "Masjid TimerA",
   afterIqamahMessage: "Lurus Rapatkan Shaf",
   afterIqamahDuration: 10,
 }

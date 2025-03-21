@@ -112,7 +112,7 @@ const initialSettings: PrayerSettings = {
     Maghrib: 5,
     Isha: 5,
   },
-  mosqueName: "Masjid Al-Ikhlas",
+  mosqueName: "Masjid TimerA",
   mosqueLogo: "",
   mosqueDescription: "Jl. Contoh No. 123, Jakarta",
   afterIqamahMessage: "Lurus Rapatkan Shaf",
