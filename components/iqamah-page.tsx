@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useAppContext } from "@/contexts/app-context"
-import { formatTimeUntil } from "@/lib/prayer-times"
+import { formatTimeUntilMinutes, getPreviousPrayer } from "@/lib/prayer-times"
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import type { BackgroundSetting } from "@/contexts/app-context"
@@ -23,7 +23,7 @@ function getBackgroundStyle(bg: BackgroundSetting): React.CSSProperties {
 }
 
 export function IqamahPage() {
-  const { nextPrayer, settings, iqamahTimeRemaining, afterIqamahTimeRemaining } = useAppContext()
+  const { nextPrayer, previousPrayer,  settings, iqamahTimeRemaining, afterIqamahTimeRemaining } = useAppContext()
 
   const [countdown, setCountdown] = useState(iqamahTimeRemaining)
   const isAfterIqamah = iqamahTimeRemaining <= 0
@@ -94,9 +94,10 @@ export function IqamahPage() {
       <div className="flex-1 flex flex-col items-center justify-center p-8" style={fontStyle}>
         {!isAfterIqamah ? (
           <>
-            <h2 className="text-4xl md:text-6xl font-bold mb-8">Iqamah {nextPrayer?.indonesianName}</h2>
+            {/* <h2 className="text-4xl md:text-6xl font-bold mb-8">Iqamah {nextPrayer?.indonesianName}</h2> */}
+            <h2 className="text-4xl md:text-6xl font-bold mb-8">Iqamah {previousPrayer?.indonesianName}</h2>
 
-            <div className="text-7xl md:text-9xl font-bold tabular-nums mb-8">{formatTimeUntil(countdown)}</div>
+            <div className="text-7xl md:text-9xl font-bold tabular-nums mb-8">{formatTimeUntilMinutes(countdown)}</div>
 
             <p className="text-2xl md:text-3xl text-muted-foreground">Bersiap untuk sholat berjamaah</p>
           </>

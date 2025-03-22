@@ -254,6 +254,39 @@ export function getTimeUntilNextPrayer(nextPrayer: PrayerTime | null): number {
   return nextPrayer.time.getTime() - now.getTime()
 }
 
+export function getTimeSincePreviousPrayer(prevPrayer: PrayerTime | null): number {
+  if (!prevPrayer) return 0
+
+  const now = new Date()
+  return now.getTime() - prevPrayer.time.getTime() 
+}
+
+export function getPreviousPrayer(prayerTimes: PrayerTime[]): PrayerTime | null {
+  const now = new Date();
+
+  // Filter out Sunrise for previous prayer calculation
+  const prayers = prayerTimes.filter((prayer) => prayer.name !== "Sunrise");
+
+  for (let i = prayers.length - 1; i >= 0; i--) {
+    const prayer = prayers[i];
+    if (prayer.time < now) {
+      return prayer;
+    }
+  }
+
+  // If no prayer is found for today, return the last prayer of yesterday
+  // This handles the case when we're before the first prayer of the day
+  if (prayers.length > 0) {
+    const yesterdayPrayer = { ...prayers[prayers.length - 1] };
+    const yesterdayTime = new Date(yesterdayPrayer.time);
+    yesterdayTime.setDate(yesterdayTime.getDate() - 1);
+    yesterdayPrayer.time = yesterdayTime;
+    return yesterdayPrayer;
+  }
+
+  return null;
+}
+
 export function formatTimeUntil(ms: number): string {
   if (ms <= 0) return "00:00:00"
 
@@ -262,6 +295,17 @@ export function formatTimeUntil(ms: number): string {
   const hours = Math.floor(ms / (1000 * 60 * 60))
 
   return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+}
+
+
+export function formatTimeUntilMinutes(ms: number): string {
+  if (ms <= 0) return "00:00"
+
+  const seconds = Math.floor((ms / 1000) % 60)
+  const minutes = Math.floor((ms / (1000 * 60)) % 60)
+
+
+  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
 }
 
 export { DEFAULT_SETTINGS }

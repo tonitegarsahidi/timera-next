@@ -7,8 +7,10 @@ import {
   type PrayerSettings as PrayerSettingsType,
   calculatePrayerTimes,
   getNextPrayer,
+  getPreviousPrayer,
   getTimeUntilNextPrayer,
   type PrayerName,
+  getTimeSincePreviousPrayer,
 } from "@/lib/prayer-times"
 import { saveSettings, getSettings, saveSlides, getSlides } from "@/lib/db"
 
@@ -52,6 +54,7 @@ interface AppContextType {
   settings: PrayerSettings
   updateSettings: (settings: PrayerSettings) => void
   nextPrayer: PrayerTime | null
+  previousPrayer: PrayerTime | null
   timeUntilNextPrayer: number
   currentSlideIndex: number
   setCurrentSlideIndex: (index: number) => void
@@ -96,7 +99,7 @@ const initialSettings: PrayerSettings = {
     longitude: 106.8456,
   },
   cityName: "Jakarta",
-  calculationMethod: "MWL",
+  calculationMethod: "Singapore",
   adjustments: {
     Fajr: 0,
     Sunrise: 0,
@@ -140,6 +143,7 @@ const defaultContextValue: AppContextType = {
   settings: initialSettings,
   updateSettings: () => {},
   nextPrayer: null,
+  previousPrayer: null,
   timeUntilNextPrayer: 0,
   currentSlideIndex: 0,
   setCurrentSlideIndex: () => {},
@@ -173,7 +177,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([])
   const [currentPage, setCurrentPage] = useState<AppPage>("schedule")
   const [nextPrayer, setNextPrayer] = useState<PrayerTime | null>(null)
+  const [previousPrayer, setPreviousPrayer] = useState<PrayerTime | null>(null)
   const [timeUntilNextPrayer, setTimeUntilNextPrayer] = useState(0)
+  const [timeSincePreviousPrayer, setTimeSincePreviousPrayer] = useState(0)
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0)
   const [slides, setSlides] = useState<string[]>([
     "/placeholder.svg?height=600&width=800",
@@ -266,12 +272,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const next = getNextPrayer(prayerTimes)
     setNextPrayer(next)
+    const prev = getPreviousPrayer(prayerTimes)
+    setPreviousPrayer(prev)
 
     if (next) {
       const timeUntil = getTimeUntilNextPrayer(next)
       setTimeUntilNextPrayer(timeUntil)
     } else {
       setTimeUntilNextPrayer(0)
+    }
+
+    if (prev) {
+      const timeSince = getTimeSincePreviousPrayer(prev)
+      setTimeSincePreviousPrayer(timeSince)
+    } else {
+      setTimeSincePreviousPrayer(0)
     }
   }, [prayerTimes, currentTime])
 
@@ -287,64 +302,79 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Page transition logic
   useEffect(() => {
-    // If a page is forced to be shown, don't change it automatically
-    if (forceShowPage) {
-      setCurrentPage(forceShowPage)
-      return
-    }
+    if (!prayerTimes || prayerTimes.length === 0) return
 
-    if (!nextPrayer) return
+    const now = new Date()
+    const nextPrayerTime = getNextPrayer(prayerTimes)
+    const previousPrayerTime = getPreviousPrayer(prayerTimes)
 
-    const timeUntil = getTimeUntilNextPrayer(nextPrayer)
+    if (!nextPrayerTime || !previousPrayerTime) return
 
-    // 10 minutes before prayer time
-    if (timeUntil <= 10 * 60 * 1000 && timeUntil > 0) {
-      setCurrentPage("countdown")
-    }
-    // At prayer time
-    else if (timeUntil <= 0 && timeUntil > -2 * 60 * 1000) {
+    const timeUntilNextPrayer = nextPrayerTime.time.getTime() - now.getTime()
+    const timeSincePreviousPrayer = now.getTime() - previousPrayerTime.time.getTime()
+
+    // Adhan time: within 2 minutes after the previous prayer
+    if (timeSincePreviousPrayer <= 2 * 60 * 1000) {
       setIsAdhanTime(true)
+      setCurrentPage("schedule") // Or any other page you want to show during adhan
     }
-    // 2 minutes after prayer time (after adhan)
-    else if (timeUntil <= -2 * 60 * 1000 && nextPrayer.name !== "Sunrise") {
+    // Iqamah time: between 2 minutes and iqamah duration after the previous prayer
+    else if (
+      timeSincePreviousPrayer > 2 * 60 * 1000 &&
+      timeSincePreviousPrayer <=
+        settings.iqamahTimes[previousPrayerTime.name as keyof typeof settings.iqamahTimes] * 60 * 1000 +
+          2 * 60 * 1000
+    ) {
       setIsAdhanTime(false)
       setIsIqamahTime(true)
+      setCurrentPage("iqamah")
 
-      // Calculate iqamah time remaining
-      const iqamahDuration = settings.iqamahTimes[nextPrayer.name as keyof typeof settings.iqamahTimes] * 60 * 1000
-      const elapsedSincePrayer = Math.abs(timeUntil) - 2 * 60 * 1000
-      const remaining = iqamahDuration - elapsedSincePrayer
-
-      if (remaining > 0) {
-        setCurrentPage("iqamah")
-        setIqamahTimeRemaining(remaining)
-      } else {
-        // After iqamah time
-        const afterIqamahDuration = settings.afterIqamahDuration * 60 * 1000
-        const elapsedSinceIqamah = elapsedSincePrayer - iqamahDuration
-        const afterIqamahRemaining = afterIqamahDuration - elapsedSinceIqamah
-
-        if (afterIqamahRemaining > 0) {
-          setCurrentPage("iqamah")
-          setIqamahTimeRemaining(0)
-          setAfterIqamahTimeRemaining(afterIqamahRemaining)
-        } else {
-          // Show blank page until 30 minutes after prayer time
-          const totalElapsed = Math.abs(timeUntil)
-          if (totalElapsed < 30 * 60 * 1000) {
-            setCurrentPage("blank")
-          } else {
-            setCurrentPage("schedule")
-            setIsIqamahTime(false)
-          }
-        }
-      }
-    } else {
+      // Calculate iqamah time remaining (this might need adjustments)
+      const iqamahDuration =
+        settings.iqamahTimes[previousPrayerTime.name as keyof typeof settings.iqamahTimes] * 60 * 1000
+      const remaining = iqamahDuration - (timeSincePreviousPrayer - 2 * 60 * 1000)
+      setIqamahTimeRemaining(remaining > 0 ? remaining : 0)
+    }
+    // Prayer after Iqamah time: between 2 minutes and iqamah duration after the previous prayer
+    else if (
+      timeSincePreviousPrayer >=
+        (settings.iqamahTimes[previousPrayerTime.name as keyof typeof settings.iqamahTimes] * 60 * 1000 +
+          2 * 60 * 1000 )
+        &&
+        timeSincePreviousPrayer <=
+        (settings.iqamahTimes[previousPrayerTime.name as keyof typeof settings.iqamahTimes] + 10) * 60 * 1000 +
+          2 * 60 * 1000
+    ) {
+      setIsAdhanTime(false)
+      setIsIqamahTime(false)
+      setCurrentPage("iqamah")
+      setIqamahTimeRemaining( 0)
+    }
+    // Prayer after Iqamah time: between 2 minutes and iqamah duration after the previous prayer
+    else if (
+        timeSincePreviousPrayer >=
+        (settings.iqamahTimes[previousPrayerTime.name as keyof typeof settings.iqamahTimes] + 10) * 60 * 1000 +
+          2 * 60 * 1000
+        &&
+        timeSincePreviousPrayer <=
+        (settings.iqamahTimes[previousPrayerTime.name as keyof typeof settings.iqamahTimes] + 30) * 60 * 1000 +
+          2 * 60 * 1000
+    ) {
+      setCurrentPage("blank")
+    }
+    // 10 minutes before next prayer time
+    else if (timeUntilNextPrayer <= 10 * 60 * 1000 && timeUntilNextPrayer > 0) {
+      setCurrentPage("countdown")
+      setIsAdhanTime(false)
+      setIsIqamahTime(false)
+    }
+    // Otherwise, show the schedule
+    else {
       setCurrentPage("schedule")
       setIsAdhanTime(false)
       setIsIqamahTime(false)
     }
-  }, [nextPrayer, timeUntilNextPrayer, settings, forceShowPage])
+  }, [prayerTimes, settings, forceShowPage])
 
   const updateSettings = async (newSettings: PrayerSettings) => {
     setSettings(newSettings)
@@ -383,6 +413,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         settings,
         updateSettings,
         nextPrayer,
+        previousPrayer,
         timeUntilNextPrayer,
         currentSlideIndex,
         setCurrentSlideIndex,
@@ -414,4 +445,3 @@ export function useAppContext() {
   }
   return context
 }
-
