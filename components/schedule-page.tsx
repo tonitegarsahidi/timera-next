@@ -10,6 +10,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import type { BackgroundSetting, CardStyle } from "@/contexts/app-context"
+import { formatTimeWithSeconds } from "@/lib/utils"
 
 // Helper function to generate background style
 function getBackgroundStyle(bg: BackgroundSetting): React.CSSProperties {
@@ -45,6 +46,7 @@ export function SchedulePage() {
     settings,
     customText,
     nextPrayer,
+    previousPrayer,
     timeUntilNextPrayer,
     setForceShowPage,
   } = useAppContext()
@@ -64,14 +66,6 @@ export function SchedulePage() {
     setCountdown(timeUntilNextPrayer)
   }, [timeUntilNextPrayer])
 
-  const formatTimeWithSeconds = (date: Date): string => {
-    return date.toLocaleTimeString("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    })
-  }
 
   // Find the current prayer (the most recent prayer that has passed)
   const getCurrentPrayer = () => {

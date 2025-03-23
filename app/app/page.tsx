@@ -1,20 +1,24 @@
-"use client"
+"use client";
 
-import { useAppContext } from "@/contexts/app-context"
-import { SchedulePage } from "@/components/schedule-page"
-import { CountdownPage } from "@/components/countdown-page"
-import { IqamahPage } from "@/components/iqamah-page"
-import { BlankPage } from "@/components/blank-page"
-import { ModeToggle } from "@/components/mode-toggle"
-import Link from "next/link"
-import { Settings } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useAppContext } from "@/contexts/app-context";
+import { SchedulePage } from "@/components/schedule-page";
+import { CountdownPage } from "@/components/countdown-page";
+import { IqamahPage } from "@/components/iqamah-page";
+import { BlankPage } from "@/components/blank-page";
+import { ModeToggle } from "@/components/mode-toggle";
+import Link from "next/link";
+import { Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useSearchParams } from "next/navigation";
 
 export default function AppPage() {
-  const { currentPage, forceShowPage, setForceShowPage } = useAppContext()
+  const { currentPage, forceShowPage, setForceShowPage } = useAppContext();
+
+  const searchParams = useSearchParams();
+  const isDebug = searchParams.get("isDebug") === "true"; // Cek apakah isDebug=true
 
   // If a page is forced to be shown, show it
-  const displayPage = forceShowPage || currentPage
+  const displayPage = forceShowPage || currentPage;
 
   return (
     <main className="min-h-screen islamic-pattern">
@@ -34,7 +38,16 @@ export default function AppPage() {
       {displayPage === "iqamah" && <IqamahPage />}
       {displayPage === "blank" && <BlankPage />}
 
+      {isDebug && (
       <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setForceShowPage("schedule")}
+          className="bg-background/80 backdrop-blur-sm"
+        >
+          Jadwal
+        </Button>
         <Button
           variant="outline"
           size="sm"
@@ -60,7 +73,7 @@ export default function AppPage() {
           Blank
         </Button>
       </div>
+      )}
     </main>
-  )
+  );
 }
-

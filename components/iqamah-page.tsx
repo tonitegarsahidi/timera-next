@@ -1,50 +1,59 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useAppContext } from "@/contexts/app-context"
-import { formatTimeUntilMinutes, getPreviousPrayer } from "@/lib/prayer-times"
-import { useEffect, useState } from "react"
-import Image from "next/image"
-import type { BackgroundSetting } from "@/contexts/app-context"
+import { useAppContext } from "@/contexts/app-context";
+import { formatTimeUntilMinutes, getPreviousPrayer } from "@/lib/prayer-times";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import type { BackgroundSetting } from "@/contexts/app-context";
+import { formatTimeWithSeconds } from "@/lib/utils";
 
 // Helper function to generate background style
 function getBackgroundStyle(bg: BackgroundSetting): React.CSSProperties {
   if (bg.type === "color" && bg.value) {
-    return { backgroundColor: bg.value }
+    return { backgroundColor: bg.value };
   } else if (bg.type === "image" && bg.value) {
     return {
       backgroundImage: `url(${bg.value})`,
       backgroundSize: "cover",
       backgroundPosition: "center",
-    }
+    };
   }
-  return {}
+  return {};
 }
 
 export function IqamahPage() {
-  const { nextPrayer, previousPrayer,  settings, iqamahTimeRemaining, afterIqamahTimeRemaining } = useAppContext()
+  const {
+    nextPrayer,
+    previousPrayer,
+    settings,
+    iqamahTimeRemaining,
+    afterIqamahTimeRemaining,
+    isAdhanTime,
+    currentTime
+  } = useAppContext();
 
-  const [countdown, setCountdown] = useState(iqamahTimeRemaining)
-  const isAfterIqamah = iqamahTimeRemaining <= 0
+  const [countdown, setCountdown] = useState(iqamahTimeRemaining);
+  const isAfterIqamah = iqamahTimeRemaining <= 0;
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCountdown((prev) => Math.max(0, prev - 1000))
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [])
+      setCountdown((prev) => Math.max(0, prev - 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (isAfterIqamah) {
-      setCountdown(afterIqamahTimeRemaining)
+      setCountdown(afterIqamahTimeRemaining);
     } else {
-      setCountdown(iqamahTimeRemaining)
+      setCountdown(iqamahTimeRemaining);
     }
-  }, [iqamahTimeRemaining, afterIqamahTimeRemaining, isAfterIqamah])
+  }, [iqamahTimeRemaining, afterIqamahTimeRemaining, isAfterIqamah]);
 
   // Get app background style
-  const appBackgroundStyle = getBackgroundStyle(settings.appBackground)
+  const appBackgroundStyle = getBackgroundStyle(settings.appBackground);
 
   // Get font style for the prayer that's currently in iqamah
   const fontStyle = nextPrayer
@@ -58,13 +67,14 @@ export function IqamahPage() {
             ? settings.prayerCardStyles[nextPrayer.name].fontColor
             : undefined,
       }
-    : {}
+    : {};
 
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center countdown-container"
       style={
-        settings.appBackground.type === "color" && settings.appBackground.value === "transparent"
+        settings.appBackground.type === "color" &&
+        settings.appBackground.value === "transparent"
           ? {}
           : appBackgroundStyle
       }
@@ -85,27 +95,51 @@ export function IqamahPage() {
           <div>
             <h1 className="text-3xl font-bold">{settings.mosqueName}</h1>
             {settings.mosqueDescription && (
-              <p className="text-sm text-muted-foreground">{settings.mosqueDescription}</p>
+              <p className="text-sm text-muted-foreground">
+                {settings.mosqueDescription}
+              </p>
             )}
           </div>
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-8" style={fontStyle}>
+      <div
+        className="flex-1 flex flex-col items-center justify-center p-8"
+        style={fontStyle}
+      >
         {!isAfterIqamah ? (
           <>
-            {/* <h2 className="text-4xl md:text-6xl font-bold mb-8">Iqamah {nextPrayer?.indonesianName}</h2> */}
-            <h2 className="text-4xl md:text-6xl font-bold mb-8">Iqamah {previousPrayer?.indonesianName}</h2>
+            {isAdhanTime ? (
+              <h2 className="text-4xl md:text-6xl font-bold mb-8">
+                Adzan {previousPrayer?.indonesianName}
+              </h2>
+            ) : (
+              <>
+                <h2 className="text-4xl md:text-6xl font-bold mb-8">
+                  Iqamah {previousPrayer?.indonesianName}
+                </h2>
+                <div className="text-7xl md:text-9xl font-bold tabular-nums mb-8">
+                  {formatTimeUntilMinutes(countdown)}
+                </div>
 
-            <div className="text-7xl md:text-9xl font-bold tabular-nums mb-8">{formatTimeUntilMinutes(countdown)}</div>
-
-            <p className="text-2xl md:text-3xl text-muted-foreground">Bersiap untuk sholat berjamaah</p>
+                <p className="text-2xl md:text-3xl text-muted-foreground">
+                  Bersiap untuk sholat berjamaah
+                </p>
+              </>
+            )}
           </>
         ) : (
-          <h2 className="text-4xl md:text-6xl font-bold text-center">{settings.afterIqamahMessage}</h2>
+          <>
+          <h2 className="text-4xl md:text-6xl font-bold text-center">
+            {settings.afterIqamahMessage}
+          </h2>
+          <p>____</p>
+          <p className="text-2xl md:text-3xl text-muted-foreground">
+            {formatTimeWithSeconds(currentTime)}
+                </p>
+          </>
         )}
       </div>
     </div>
-  )
+  );
 }
-

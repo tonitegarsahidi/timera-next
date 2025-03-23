@@ -37,6 +37,7 @@ export interface PrayerSettings extends PrayerSettingsType {
   mosqueDescription: string
   afterIqamahMessage: string
   afterIqamahDuration: number
+  afterPrayerDuration: number
   fontFamily: string
   fontSize: string
   appBackground: BackgroundSetting
@@ -120,6 +121,7 @@ const initialSettings: PrayerSettings = {
   mosqueDescription: "Jl. Contoh No. 123, Jakarta",
   afterIqamahMessage: "Lurus Rapatkan Shaf",
   afterIqamahDuration: 10,
+  afterPrayerDuration: 20,
   fontFamily: "Inter",
   fontSize: "medium",
   appBackground: { type: "color", value: "transparent" },
@@ -313,17 +315,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const timeUntilNextPrayer = nextPrayerTime.time.getTime() - now.getTime()
     const timeSincePreviousPrayer = now.getTime() - previousPrayerTime.time.getTime()
 
-    // Adhan time: within 2 minutes after the previous prayer
-    if (timeSincePreviousPrayer <= 2 * 60 * 1000) {
+    //================================================
+    // DITAMPILKAN WAKTU ADZAN (DURASI 1 MENIT) 
+    //================================================
+    if (
+      timeSincePreviousPrayer >=0 && 
+      timeSincePreviousPrayer <= 1 * 60 * 1000  // ini durasi adzan
+    ) {
       setIsAdhanTime(true)
-      setCurrentPage("schedule") // Or any other page you want to show during adhan
+      setIsIqamahTime(false)
+      setCurrentPage("iqamah") // Or any other page you want to show during adhan
+      const iqamahDuration =
+        settings.iqamahTimes[previousPrayerTime.name as keyof typeof settings.iqamahTimes] * 60 * 1000
+      const remaining = iqamahDuration - (timeSincePreviousPrayer - 1 * 60 * 1000)
+      setIqamahTimeRemaining(remaining > 0 ? remaining : 0)
     }
-    // Iqamah time: between 2 minutes and iqamah duration after the previous prayer
+    //================================================
+    // DITAMPILKAN ANTARA ADZAN + durasi Adzan DAN IQAMAH
+    //================================================
+    // Iqamah time: between 1 minutes and iqamah duration after the previous prayer
     else if (
-      timeSincePreviousPrayer > 2 * 60 * 1000 &&
+      timeSincePreviousPrayer > 1 * 60 * 1000 &&
       timeSincePreviousPrayer <=
         settings.iqamahTimes[previousPrayerTime.name as keyof typeof settings.iqamahTimes] * 60 * 1000 +
-          2 * 60 * 1000
+          1 * 60 * 1000
     ) {
       setIsAdhanTime(false)
       setIsIqamahTime(true)
@@ -332,18 +347,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       // Calculate iqamah time remaining (this might need adjustments)
       const iqamahDuration =
         settings.iqamahTimes[previousPrayerTime.name as keyof typeof settings.iqamahTimes] * 60 * 1000
-      const remaining = iqamahDuration - (timeSincePreviousPrayer - 2 * 60 * 1000)
+      const remaining = iqamahDuration - (timeSincePreviousPrayer - 1 * 60 * 1000)
       setIqamahTimeRemaining(remaining > 0 ? remaining : 0)
     }
-    // Prayer after Iqamah time: between 2 minutes and iqamah duration after the previous prayer
+    //================================================
+    // DITAMPILKAN SAAT IQOMAH - SELESAI SHOLAT, 
+    // DURASI : settings.afterIqamahDuration
+    //================================================
     else if (
       timeSincePreviousPrayer >=
         (settings.iqamahTimes[previousPrayerTime.name as keyof typeof settings.iqamahTimes] * 60 * 1000 +
-          2 * 60 * 1000 )
+          1 * 60 * 1000 )
         &&
         timeSincePreviousPrayer <=
-        (settings.iqamahTimes[previousPrayerTime.name as keyof typeof settings.iqamahTimes] + 10) * 60 * 1000 +
-          2 * 60 * 1000
+        (settings.iqamahTimes[previousPrayerTime.name as keyof typeof settings.iqamahTimes] + settings.afterIqamahDuration) * 60 * 1000 +
+          1 * 60 * 1000
     ) {
       setIsAdhanTime(false)
       setIsIqamahTime(false)
@@ -354,11 +372,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     else if (
         timeSincePreviousPrayer >=
         (settings.iqamahTimes[previousPrayerTime.name as keyof typeof settings.iqamahTimes] + 10) * 60 * 1000 +
-          2 * 60 * 1000
+          1 * 60 * 1000
         &&
         timeSincePreviousPrayer <=
         (settings.iqamahTimes[previousPrayerTime.name as keyof typeof settings.iqamahTimes] + 30) * 60 * 1000 +
-          2 * 60 * 1000
+          1 * 60 * 1000
     ) {
       setCurrentPage("blank")
     }

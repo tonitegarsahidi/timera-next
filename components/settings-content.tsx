@@ -345,7 +345,7 @@ export function SettingsContent() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="after-iqamah-duration">
-                    Durasi Pesan Setelah Iqamah (menit): {localSettings.afterIqamahDuration}
+                    Durasi Estimasi Waktu Sholat (menit): {localSettings.afterIqamahDuration}
                   </Label>
                   <Slider
                     id="after-iqamah-duration"
@@ -357,6 +357,24 @@ export function SettingsContent() {
                       setLocalSettings({
                         ...localSettings,
                         afterIqamahDuration: value[0],
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="after-prayer-duration">
+                    Durasi Halaman Kosong Setelah Sholat Selesai (menit): {localSettings.afterPrayerDuration}
+                  </Label>
+                  <Slider
+                    id="after-prayer-duration"
+                    min={1}
+                    max={30}
+                    step={1}
+                    value={[localSettings.afterPrayerDuration]}
+                    onValueChange={(value) =>
+                      setLocalSettings({
+                        ...localSettings,
+                        afterPrayerDuration: value[0],
                       })
                     }
                   />

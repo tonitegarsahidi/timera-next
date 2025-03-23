@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useAppContext } from "@/contexts/app-context"
-import { formatTimeUntil } from "@/lib/prayer-times"
+import { formatTimeUntil, formatTimeUntilMinutes } from "@/lib/prayer-times"
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import type { BackgroundSetting } from "@/contexts/app-context"
@@ -79,7 +79,7 @@ export function CountdownPage() {
       </header>
 
       <div className="flex-1 flex flex-col items-center justify-center p-8" style={fontStyle}>
-        <h2 className="text-4xl md:text-6xl font-bold mb-8">Bersiap untuk Sholat {nextPrayer?.indonesianName}</h2>
+        <h2 className="text-4xl md:text-6xl font-bold mb-8">Bersiap untuk Adzan {nextPrayer?.indonesianName}</h2>
 
         <div className="text-7xl md:text-9xl font-bold tabular-nums mb-8">{formatTimeUntil(countdown)}</div>
 
