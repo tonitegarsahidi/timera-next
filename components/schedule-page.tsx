@@ -100,8 +100,8 @@ export function SchedulePage() {
               <Image
                 src={settings.mosqueLogo || "/placeholder.svg"}
                 alt="Logo Masjid"
-                width={48}
-                height={48}
+                width={64}
+                height={64}
                 className="object-contain"
               />
             </div>
