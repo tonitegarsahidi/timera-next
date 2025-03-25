@@ -157,7 +157,7 @@ export function SchedulePage() {
               </div>
 
               {/* Page navigation */}
-              <div className="absolute top-4 right-4 flex items-center gap-2 bg-background/80 backdrop-blur-sm rounded-full px-3 py-1">
+              {/* <div className="absolute top-4 right-4 flex items-center gap-2 bg-background/80 backdrop-blur-sm rounded-full px-3 py-1">
                 <Button variant="ghost" size="sm" className="text-xs h-6" onClick={() => setForceShowPage("countdown")}>
                   Countdown
                 </Button>
@@ -167,7 +167,7 @@ export function SchedulePage() {
                 <Button variant="ghost" size="sm" className="text-xs h-6" onClick={() => setForceShowPage("blank")}>
                   Blank
                 </Button>
-              </div>
+              </div> */}
             </div>
           </div>
 

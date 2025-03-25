@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js"
 import type { PrayerSettings } from "@/contexts/app-context"
+import { SlideItem } from "./db"
 
 // Membuat client Supabase untuk sisi client
 const createSupabaseClient = () => {
@@ -65,18 +66,18 @@ export async function getSettingsFromSupabase(userId: string) {
 }
 
 // Fungsi untuk menyimpan slides ke Supabase
-export async function saveSlidesToSupabase(userId: string, slides: string[]) {
+export async function saveSlidesToSupabase(userId: string, slides: SlideItem[]) {
   const supabase = getSupabaseClient()
 
   const { error } = await supabase.from("user_slides").upsert(
     {
       user_id: userId,
-      slides: slides,
+      slides: JSON.stringify(slides), // Simpan sebagai JSON
       updated_at: new Date().toISOString(),
     },
     {
       onConflict: "user_id",
-    },
+    }
   )
 
   if (error) {
@@ -87,8 +88,7 @@ export async function saveSlidesToSupabase(userId: string, slides: string[]) {
   return true
 }
 
-// Fungsi untuk mengambil slides dari Supabase
-export async function getSlidesFromSupabase(userId: string) {
+export async function getSlidesFromSupabase(userId: string): Promise<SlideItem[] | null> {
   const supabase = getSupabaseClient()
 
   const { data, error } = await supabase.from("user_slides").select("slides").eq("user_id", userId).single()
@@ -98,6 +98,7 @@ export async function getSlidesFromSupabase(userId: string) {
     return null
   }
 
-  return data?.slides
+  return data?.slides ? JSON.parse(data.slides) : []
 }
+
 

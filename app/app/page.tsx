@@ -10,8 +10,18 @@ import Link from "next/link";
 import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 export default function AppPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AppContent />
+    </Suspense>
+  );
+}
+
+
+function AppContent() {
   const { currentPage, forceShowPage, setForceShowPage } = useAppContext();
 
   const searchParams = useSearchParams();
