@@ -139,7 +139,7 @@ export function SchedulePage() {
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6 rounded-full"
-                  onClick={() => setCurrentSlideIndex((prev) => (prev - 1 + slides.length) % slides.length)}
+                  onClick={() => setCurrentSlideIndex((currentSlideIndex - 1 + slides.length) % slides.length)}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -150,7 +150,8 @@ export function SchedulePage() {
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6 rounded-full"
-                  onClick={() => setCurrentSlideIndex((prev) => (prev + 1) % slides.length)}
+                  onClick={() => setCurrentSlideIndex((currentSlideIndex + 1) % slides.length)}
+
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>

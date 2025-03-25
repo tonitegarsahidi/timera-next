@@ -207,7 +207,7 @@ export function SettingsContent() {
     <div className="min-h-screen p-4 md:p-8 islamic-pattern">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center mb-6">
-          <Link href="/" className="mr-4">
+          <Link href="/app" className="mr-4">
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>
