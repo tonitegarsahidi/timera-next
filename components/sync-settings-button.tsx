@@ -92,7 +92,7 @@ export function SyncSettingsButton({ user }: SyncSettingsButtonProps) {
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
           <Cloud className="mr-2 h-4 w-4" />
-          Sinkronisasi
+          Sinkronisasi Pengaturan
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

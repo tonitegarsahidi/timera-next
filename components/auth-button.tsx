@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { getSupabaseClient } from "@/lib/supabase"
 import { User, LogOut, Loader2 } from "lucide-react"
@@ -22,41 +22,52 @@ interface AuthButtonProps {
 export function AuthButton({ onAuthChange }: AuthButtonProps) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [loading, setLoading] = useState(true)
+  const userRef = useRef<SupabaseUser | null>(null)
   const supabase = getSupabaseClient()
 
+  // 1️⃣ Hanya ambil user pertama kali
   useEffect(() => {
-    // Check current auth status
     const checkUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      setUser(user)
-      if (onAuthChange) onAuthChange(user)
+      setLoading(true)
+      const { data: { user } } = await supabase.auth.getUser()
+
+      // Update hanya jika user berubah
+      if (user?.id !== userRef.current?.id) {
+        userRef.current = user
+        setUser(user)
+        if (onAuthChange) onAuthChange(user)
+      }
       setLoading(false)
     }
 
     checkUser()
+  }, []) // ⬅️ Hanya dijalankan sekali saat mount
 
-    // Set up auth state listener
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null)
-      if (onAuthChange) onAuthChange(session?.user ?? null)
-    })
+  // 2️⃣ Hanya update user jika `onAuthStateChange` berubah
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        const newUser = session?.user ?? null
+
+        // Hindari update jika user tidak berubah
+        if (newUser?.id !== userRef.current?.id) {
+          userRef.current = newUser
+          setUser(newUser)
+          if (onAuthChange) onAuthChange(newUser)
+        }
+      }
+    )
 
     return () => {
-      subscription.unsubscribe()
+      authListener.subscription.unsubscribe()
     }
-  }, [supabase, onAuthChange])
+  }, [onAuthChange]) // ⬅️ Tidak pakai `supabase`, agar tidak trigger loop
 
   const handleSignIn = async () => {
     setLoading(true)
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: window.location.origin,
-      },
+      options: { redirectTo: window.location.origin },
     })
   }
 
@@ -106,4 +117,3 @@ export function AuthButton({ onAuthChange }: AuthButtonProps) {
     </Button>
   )
 }
-
