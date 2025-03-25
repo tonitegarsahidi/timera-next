@@ -286,6 +286,22 @@ export function getPreviousPrayer(prayerTimes: PrayerTime[]): PrayerTime | null 
 
   return null;
 }
+export function formatTimeCountdownDetail(ms: number): string {
+  if (ms <= 0) return "0 detik";
+
+  const seconds = Math.floor((ms / 1000) % 60);
+  const minutes = Math.floor((ms / (1000 * 60)) % 60);
+  const hours = Math.floor(ms / (1000 * 60 * 60));
+
+  let result = [];
+
+  if (hours > 0) result.push(`${hours} jam`);
+  if (minutes > 0) result.push(`${minutes} menit`);
+  // if (seconds > 0 || result.length === 0) result.push(`${seconds} detik`);
+
+  return result.join(" ");
+}
+
 
 export function formatTimeUntil(ms: number): string {
   if (ms <= 0) return "00:00:00"

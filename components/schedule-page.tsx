@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useAppContext } from "@/contexts/app-context"
-import { formatTime, formatTimeUntil } from "@/lib/prayer-times"
+import { formatTime, formatTimeCountdownDetail, formatTimeUntil } from "@/lib/prayer-times"
 import { Card, CardContent } from "@/components/ui/card"
 import { Clock, ChevronLeft, ChevronRight, Timer } from "lucide-react"
 import Image from "next/image"
@@ -93,29 +93,30 @@ export function SchedulePage() {
           : appBackgroundStyle
       }
     >
-      <header className="w-full bg-primary/10 p-4 text-center">
+      <header className="w-full bg-primary/20 p-8 text-center">
         <div className="flex items-center justify-center gap-3">
           {settings.mosqueLogo && (
-            <div className="relative w-12 h-12">
+            <div className="relative w-20 h-20">
               <Image
                 src={settings.mosqueLogo || "/placeholder.svg"}
                 alt="Logo Masjid"
-                width={64}
-                height={64}
+                width={100}
+                height={100}
                 className="object-contain"
               />
             </div>
           )}
           <div>
-            <h1 className="text-3xl font-bold">{settings.mosqueName}</h1>
+            <h1 className="text-5xl font-bold">{settings.mosqueName}</h1>
             {settings.mosqueDescription && (
-              <p className="text-sm text-muted-foreground">{settings.mosqueDescription}</p>
+              <p className="text-xl mt-2">{settings.mosqueDescription}</p>
             )}
           </div>
         </div>
       </header>
 
       <div className="flex-1 flex flex-col md:flex-row p-4 gap-4">
+
         {/* Left side - Slides (2/3 of screen) */}
         <div className="md:w-2/3 flex flex-col">
           <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
@@ -184,7 +185,7 @@ export function SchedulePage() {
                 <Clock className="h-5 w-5 text-primary" />
                 <span className="text-lg font-medium">Waktu Sekarang</span>
               </div>
-              <span className="text-4xl font-bold tabular-nums">{formatTimeWithSeconds(currentTime)}</span>
+              <span className="text-5xl font-bold tabular-nums">{formatTimeWithSeconds(currentTime)}</span>
             </CardContent>
           </Card>
 
@@ -199,7 +200,7 @@ export function SchedulePage() {
                   <Timer className="h-5 w-5 text-primary" />
                   <span className="text-lg font-medium">Menuju {nextPrayer.indonesianName}</span>
                 </div>
-                <span className="text-3xl font-bold tabular-nums">{formatTimeUntil(countdown)}</span>
+                <span className="text-3xl font-bold tabular-nums">{formatTimeCountdownDetail(countdown)}</span>
               </CardContent>
             </Card>
           )}
