@@ -7,10 +7,10 @@ import { IqamahPage } from "@/components/iqamah-page";
 import { BlankPage } from "@/components/blank-page";
 import { ModeToggle } from "@/components/mode-toggle";
 import Link from "next/link";
-import { Settings } from "lucide-react";
+import { Maximize, Minimize, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 
 export default function AppPage() {
   return (
@@ -30,6 +30,18 @@ function AppContent() {
   // If a page is forced to be shown, show it
   const displayPage = forceShowPage || currentPage;
 
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
   return (
     <main className="min-h-screen islamic-pattern">
       <div className="absolute top-4 right-4 flex items-center gap-2 z-50">
@@ -41,6 +53,15 @@ function AppContent() {
         >
           <Settings className="h-5 w-5" />
         </Link>
+
+        <button
+        onClick={toggleFullscreen}
+        className="rounded-full p-2 bg-secondary hover:bg-secondary/80 transition-colors"
+        aria-label="Fullscreen Toggle"
+      >
+        {isFullscreen ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
+      </button>
+
       </div>
 
       {displayPage === "schedule" && <SchedulePage />}
