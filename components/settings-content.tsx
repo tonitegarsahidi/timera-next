@@ -23,6 +23,7 @@ import type { CalculationMethodName } from "@/lib/prayer-times"
 import { AuthButton } from "@/components/auth-button"
 import { SyncSettingsButton } from "@/components/sync-settings-button"
 import type { User } from "@supabase/supabase-js"
+import MapboxMap from "@/components/MapboxMap"
 
 // Update the SettingsContent function to include the new fields and functionality
 export function SettingsContent() {
@@ -612,6 +613,63 @@ export function SettingsContent() {
                 <CardDescription>Atur lokasi dan penyesuaian waktu sholat</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Location Settings */}
+                <div className="space-y-2">
+                  <Label>Lokasi Masjid</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="latitude">Latitude</Label>
+                      <Input
+                        type="number"
+                        id="latitude"
+                        value={localSettings.coordinates.latitude}
+                        onChange={(e) => {
+                          const newLatitude = parseFloat(e.target.value);
+                          setLocalSettings((prevSettings) => ({
+                            ...prevSettings,
+                            coordinates: {
+                              ...prevSettings.coordinates,
+                              latitude: newLatitude,
+                            },
+                          }));
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="longitude">Longitude</Label>
+                      <Input
+                        type="number"
+                        id="longitude"
+                        value={localSettings.coordinates.longitude}
+                        onChange={(e) => {
+                          const newLongitude = parseFloat(e.target.value);
+                          setLocalSettings((prevSettings) => ({
+                            ...prevSettings,
+                            coordinates: {
+                              ...prevSettings.coordinates,
+                              longitude: newLongitude,
+                            },
+                          }));
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <MapboxMap
+                  initialCoordinates={localSettings.coordinates}
+                  accessToken="pk.eyJ1IjoidG9uaXRlZ2Fyc2FoaWRpIiwiYSI6ImNtOG83aDR5czA4eG0ycXM4NzlqMDR1N24ifQ.0J2BjGQynzgDaXyKrEeIkw"
+                  onCoordinatesChange={(newCoordinates) => {
+                    setLocalSettings((prevSettings) => ({
+                      ...prevSettings,
+                      coordinates: {
+                        latitude: newCoordinates.latitude,
+                        longitude: newCoordinates.longitude,
+                      },
+                    }));
+                  }}
+                />
+
                 <div className="space-y-2">
                   <Label htmlFor="city-name">Nama Kota</Label>
                   <Input
@@ -625,50 +683,6 @@ export function SettingsContent() {
                     }
                   />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="latitude">Latitude</Label>
-                    <Input
-                      id="latitude"
-                      type="number"
-                      step="0.0001"
-                      value={localSettings.coordinates.latitude}
-                      onChange={(e) =>
-                        setLocalSettings({
-                          ...localSettings,
-                          coordinates: {
-                            ...localSettings.coordinates,
-                            latitude: Number.parseFloat(e.target.value),
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="longitude">Longitude</Label>
-                    <Input
-                      id="longitude"
-                      type="number"
-                      step="0.0001"
-                      value={localSettings.coordinates.longitude}
-                      onChange={(e) =>
-                        setLocalSettings({
-                          ...localSettings,
-                          coordinates: {
-                            ...localSettings.coordinates,
-                            longitude: Number.parseFloat(e.target.value),
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                {/* Detect Location Button */}
-                <Button variant="outline" onClick={detectLocation} className="w-full">
-                  Deteksi Lokasi Saya
-                </Button>
-
                 <div className="space-y-2 mt-4">
                   <Label htmlFor="calculation-method">Metode Perhitungan</Label>
                   <Select
@@ -871,4 +885,3 @@ export function SettingsContent() {
     </div>
   )
 }
-

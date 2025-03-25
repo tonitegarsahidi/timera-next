@@ -3,6 +3,7 @@ import type React from "react"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import './globals.css'
+import Head from 'next/head';
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -51,11 +52,14 @@ export default function RootLayout({
 
   return (
     <html lang="id" suppressHydrationWarning>
-      <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
+          <Head>
+            <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet" />
+          </Head>
+          <body className={inter.className}>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+              {children}
+            </ThemeProvider>
+          </body>
+        </html>
   )
 }
