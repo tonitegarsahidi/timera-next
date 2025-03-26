@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TimerA - Jadwal Sholat Digital
 
-## Getting Started
+TimerA adalah aplikasi jadwal sholat digital yang dirancang untuk digunakan di masjid. Aplikasi ini menampilkan jadwal sholat harian dan dapat dikonfigurasi dengan mudah sesuai kebutuhan pengguna.
 
-First, run the development server:
+## 🚀 Mulai Menggunakan
+
+Pastikan Anda memiliki Node.js terinstal di sistem Anda. Kemudian, jalankan perintah berikut untuk memulai server pengembangan:
 
 ```bash
 npm run dev
-# or
+# atau
 yarn dev
-# or
+# atau
 pnpm dev
-# or
+# atau
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka [http://localhost:3000](http://localhost:3000) di browser untuk melihat hasilnya.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Anda dapat mulai mengedit dengan memodifikasi `app/page.tsx`. Perubahan akan otomatis diterapkan saat file disimpan.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✨ Fitur Utama
+- Jadwal sholat otomatis
+- Sinkronisasi dengan akun Google untuk penyimpanan cloud
+- Mode full-screen untuk tampilan di masjid
+- Konfigurasi mudah melalui UI yang intuitif
 
-## Learn More
+## 🎨 Teknologi yang Digunakan
+- **Framework**: [Next.js](https://nextjs.org)
+- **UI**: Tailwind CSS
+- **Database**: IndexedDB untuk penyimpanan lokal
 
-To learn more about Next.js, take a look at the following resources:
+## 🤝 Kontribusi
+Kami membuka kesempatan bagi siapa saja yang ingin berkontribusi! Jika Anda ingin membantu, silakan:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Fork repository ini
+2. Buat branch baru (`git checkout -b fitur-baru`)
+3. Lakukan perubahan dan commit (`git commit -m 'Menambahkan fitur X'`)
+4. Push branch Anda (`git push origin fitur-baru`)
+5. Buat pull request
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Kami akan dengan senang hati meninjau kontribusi Anda! 🚀
 
-## Deploy on Vercel
+## 📄 Lisensi
+Proyek ini menggunakan lisensi MIT. Silakan lihat file `LICENSE` untuk detail lebih lanjut.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🌍 Deploy ke Vercel
+Cara termudah untuk menerapkan TimerA adalah menggunakan platform [Vercel](https://vercel.com/new). Anda juga dapat membaca dokumentasi Next.js terkait [deployment](https://nextjs.org/docs/app/building-your-application/deploying).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+💡 **Ingin tahu lebih lanjut?** Hubungi kami di LinkedIn atau lihat kode sumbernya di GitHub!
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Profile-blue?logo=linkedin)](https://www.linkedin.com/in/toni-tegar-sahidi-60546858/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repo-black?logo=github)](https://github.com/tonitegarsahidi/timera-next)

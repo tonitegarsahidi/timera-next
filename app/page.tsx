@@ -11,6 +11,8 @@ import {
   ArrowRight,
   CheckCircle2,
   Laptop,
+  Linkedin,
+  Github,
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -26,7 +28,7 @@ export default function LandingPage() {
             <Link href="/#fitur" className="text-emerald-900">
               Fitur
             </Link>
-            <Link href="/faq" className="text-emerald-900">
+            <Link href="/#faq" className="text-emerald-900">
               FAQ
             </Link>
             <Link href="/help" className="text-emerald-900">
@@ -41,9 +43,9 @@ export default function LandingPage() {
                   href="/app"
                   className="block px-4 py-2 hover:bg-gray-100 text-emerald-900"
                 >
-                  Versi 1 (utama)
+                  Jadwal Sholat Digital
                 </Link>
-                <Link
+                {/* <Link
                   href="/app/v2"
                   className="block px-4 py-2 hover:bg-gray-100 text-emerald-900"
                 >
@@ -54,7 +56,7 @@ export default function LandingPage() {
                   className="block px-4 py-2 hover:bg-gray-100 text-emerald-900"
                 >
                   Versi 3
-                </Link>
+                </Link> */}
                 <Link
                   href="/app/settings"
                   className="block px-4 py-2 hover:bg-gray-100 text-emerald-900"
@@ -76,8 +78,8 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-10 md:mb-0">
               <h1 className="text-4xl md:text-6xl font-bold text-emerald-900 mb-4">
-                <span className="text-emerald-600">TimerA</span> <br/> Jadwal Sholat
-                Digital
+                <span className="text-emerald-600">TimerA</span> <br /> Jadwal
+                Sholat Digital
               </h1>
               <p className="text-lg md:text-xl text-gray-700 mb-8">
                 Solusi gratis dan mudah untuk menampilkan jadwal sholat, timer
@@ -299,7 +301,9 @@ export default function LandingPage() {
             <div className="flex items-start">
               <CheckCircle2 className="h-6 w-6 text-emerald-600 mt-1 mr-3 flex-shrink-0" />
               <div>
-                <h3 className="text-lg font-bold mb-1">Gratis Sepenuhnya</h3>
+                <h3 className="text-lg font-bold mb-1 text-gray-600">
+                  Gratis Sepenuhnya
+                </h3>
                 <p className="text-gray-600">
                   Tidak ada biaya berlangganan atau pembelian. TimerA sepenuhnya
                   gratis untuk digunakan.
@@ -310,7 +314,9 @@ export default function LandingPage() {
             <div className="flex items-start">
               <CheckCircle2 className="h-6 w-6 text-emerald-600 mt-1 mr-3 flex-shrink-0" />
               <div>
-                <h3 className="text-lg font-bold mb-1">Mudah Digunakan</h3>
+                <h3 className="text-lg font-bold mb-1 text-gray-600">
+                  Mudah Digunakan
+                </h3>
                 <p className="text-gray-600">
                   Antarmuka yang sederhana dan intuitif, tidak memerlukan
                   keahlian teknis khusus untuk mengoperasikannya.
@@ -321,7 +327,7 @@ export default function LandingPage() {
             <div className="flex items-start">
               <CheckCircle2 className="h-6 w-6 text-emerald-600 mt-1 mr-3 flex-shrink-0" />
               <div>
-                <h3 className="text-lg font-bold mb-1">
+                <h3 className="text-lg font-bold mb-1 text-gray-600">
                   Tidak Perlu Instalasi
                 </h3>
                 <p className="text-gray-600">
@@ -334,7 +340,9 @@ export default function LandingPage() {
             <div className="flex items-start">
               <CheckCircle2 className="h-6 w-6 text-emerald-600 mt-1 mr-3 flex-shrink-0" />
               <div>
-                <h3 className="text-lg font-bold mb-1">Tampilan Menarik</h3>
+                <h3 className="text-lg font-bold mb-1 text-gray-600">
+                  Tampilan Menarik
+                </h3>
                 <p className="text-gray-600">
                   Desain yang elegan dan profesional untuk meningkatkan estetika
                   masjid Anda.
@@ -367,44 +375,114 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-6 md:mb-0">
-              <h2 className="text-2xl font-bold">TimerA</h2>
-              <p className="text-gray-400">
-                Jadwal Sholat Digital untuk Masjid
+      <section id="faq" className="py-16 bg-gray-100">
+        <div className="container mx-auto px-6">
+          <h2 className="text-3xl font-semibold text-center mb-8 text-gray-900">
+            Pertanyaan yang Sering Diajukan (FAQ)
+          </h2>
+
+          <div className="max-w-3xl mx-auto space-y-6">
+            <details className="bg-white p-4 rounded-lg shadow-md">
+              <summary className="font-medium cursor-pointer text-gray-800">
+                Apakah TimerA bisa digunakan tanpa koneksi internet?
+              </summary>
+              <p className="mt-2 text-gray-600">
+                Ya, TimerA dapat digunakan secara offline setelah halaman
+                dimuat. Namun, untuk menyinkronkan pengaturan ke cloud, koneksi
+                internet diperlukan.
               </p>
-            </div>
-            <div className="flex flex-col md:flex-row gap-4 md:gap-8">
-              <Link href="/app" className="text-gray-300 hover:text-white">
-                Aplikasi
-              </Link>
-              <Link href="#fitur" className="text-gray-300 hover:text-white">
-                Fitur
-              </Link>
-              <Link
-                href="/term-of-service"
-                className="text-gray-300 hover:text-white"
-              >
-                Terms Of Service
-              </Link>
-              <Link
-                href="/privacy-policy"
-                className="text-gray-300 hover:text-white"
-              >
-                Privacy Policy
-              </Link>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>
-              &copy; {new Date().getFullYear()} TimerA. Semua hak dilindungi.
-            </p>
+            </details>
+
+            <details className="bg-white p-4 rounded-lg shadow-md">
+              <summary className="font-medium cursor-pointer text-gray-800">
+                Bagaimana cara menyinkronkan pengaturan saya?
+              </summary>
+              <p className="mt-2 text-gray-600">
+                Anda bisa masuk dengan akun Google untuk menyimpan dan
+                menyinkronkan pengaturan TimerA ke cloud.
+              </p>
+            </details>
+
+            <details className="bg-white p-4 rounded-lg shadow-md">
+              <summary className="font-medium cursor-pointer text-gray-800">
+                Apakah TimerA mendukung berbagai zona waktu?
+              </summary>
+              <p className="mt-2 text-gray-600">
+                Ya, TimerA secara otomatis menyesuaikan zona waktu berdasarkan
+                lokasi perangkat Anda.
+              </p>
+            </details>
+
+            <details className="bg-white p-4 rounded-lg shadow-md">
+              <summary className="font-medium cursor-pointer text-gray-800">
+                Apakah TimerA gratis digunakan?
+              </summary>
+              <p className="mt-2 text-gray-600">
+                Ya, TimerA sepenuhnya gratis tanpa biaya langganan atau iklan.
+              </p>
+            </details>
+
+            <details className="bg-white p-4 rounded-lg shadow-md">
+              <summary className="font-medium cursor-pointer text-gray-800">
+                Bagaimana cara menampilkan TimerA di layar penuh?
+              </summary>
+              <p className="mt-2 text-gray-600">
+                Anda bisa menekan tombol layar penuh di sudut kanan atas aplikasi atau
+                menggunakan tombol <kbd>F11</kbd> pada keyboard.
+              </p>
+            </details>
           </div>
         </div>
-      </footer>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+  <div className="container mx-auto px-4">
+    <div className="flex flex-col md:flex-row justify-between items-center">
+      <div className="mb-6 md:mb-0">
+        <h2 className="text-2xl font-bold">TimerA</h2>
+        <p className="text-gray-400">Jadwal Sholat Digital untuk Masjid</p>
+      </div>
+      <div className="flex flex-col md:flex-row gap-4 md:gap-8">
+        <Link href="/app" className="text-gray-300 hover:text-white">
+          Aplikasi
+        </Link>
+        <Link href="#fitur" className="text-gray-300 hover:text-white">
+          Fitur
+        </Link>
+        <Link href="/term-of-service" className="text-gray-300 hover:text-white">
+          Terms Of Service
+        </Link>
+        <Link href="/privacy-policy" className="text-gray-300 hover:text-white">
+          Privacy Policy
+        </Link>
+      </div>
+      {/* Social Buttons */}
+      <div className="flex gap-4 mt-6 md:mt-0">
+        <a
+          href="https://www.linkedin.com/in/toni-tegar-sahidi-60546858/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gray-300 hover:text-white"
+        >
+          <Linkedin className="w-6 h-6" /> LinkedIn saya
+        </a>
+        <a
+          href="https://github.com/tonitegarsahidi/timera-next"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gray-300 hover:text-white"
+        >
+          <Github className="w-6 h-6" /> Bantu di Github
+        </a>
+      </div>
+    </div>
+    <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+      <p>&copy; {new Date().getFullYear()} TimerA. by <strong><a href="https://rimbunit.com" target="_blank" title="konsultan IT">Rimbun IT Consulting</a></strong> - Semua hak dilindungi.</p>
+    </div>
+  </div>
+</footer>
+
     </div>
   );
 }
