@@ -118,7 +118,7 @@ export function SchedulePage() {
       <div className="flex-1 flex flex-col md:flex-row p-4 gap-4">
 
         {/* Left side - Slides (2/3 of screen) */}
-        <div className="md:w-2/3 flex flex-col">
+        <div className="md:w-3/5 flex flex-col">
           <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
             {" "}
             {/* 16:9 Aspect Ratio */}
@@ -178,7 +178,7 @@ export function SchedulePage() {
         </div>
 
         {/* Right side - Prayer times (1/3 of screen) */}
-        <div className="md:w-1/3 flex flex-col gap-4">
+        <div className="md:w-2/5 flex flex-col gap-4">
           <Card className="shadow-lg overflow-hidden" style={getCardStyle(settings.currentTimeCardStyle)}>
             <CardContent className="p-4 flex flex-col items-center backdrop-blur-sm bg-background/30">
               <div className="flex items-center gap-2 mb-2">
@@ -229,7 +229,7 @@ export function SchedulePage() {
                       <span className="text-lg font-medium">{prayer.indonesianName}</span>
                       <span className="text-muted-foreground">{prayer.arabicName}</span>
                     </div>
-                    <span className="text-xl font-bold tabular-nums">{formatTime(prayer.time)}</span>
+                    <span className="text-xxl font-bold tabular-nums">{formatTime(prayer.time)}</span>
                   </CardContent>
                 </Card>
               )

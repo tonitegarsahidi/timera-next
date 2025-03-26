@@ -12,4 +12,5 @@ export function formatTimeWithSeconds(date: Date): string  {
     second: "2-digit",
     hour12: false,
   })
+  .replace(/\./g, " : "); // Ganti semua titik dengan colon
 }
