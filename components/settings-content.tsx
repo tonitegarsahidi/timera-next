@@ -1,29 +1,43 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useAppContext } from "@/contexts/app-context"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Slider } from "@/components/ui/slider"
-import type { PrayerName } from "@/lib/prayer-times"
-import { useState, useEffect } from "react"
-import { ArrowLeft, Upload, X, Minus, Plus, Sun, Moon } from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { RichTextEditor } from "@/components/rich-text-editor"
-import { CardCustomizer } from "@/components/card-customizer"
-import type { CardStyle } from "@/contexts/app-context"
-import type { CalculationMethodName } from "@/lib/prayer-times"
-import { AuthButton } from "@/components/auth-button"
-import { SyncSettingsButton } from "@/components/sync-settings-button"
-import type { User } from "@supabase/supabase-js"
-import MapboxMap from "@/components/MapboxMap"
+import { useAppContext } from "@/contexts/app-context";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Slider } from "@/components/ui/slider";
+import { calculatePrayerTimes, type PrayerName } from "@/lib/prayer-times";
+import { useState, useEffect, useRef } from "react";
+import { ArrowLeft, Upload, X, Minus, Plus, Sun, Moon } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/rich-text-editor";
+import { CardCustomizer } from "@/components/card-customizer";
+import type { CardStyle } from "@/contexts/app-context";
+import type { CalculationMethodName } from "@/lib/prayer-times";
+import { AuthButton } from "@/components/auth-button";
+import { SyncSettingsButton } from "@/components/sync-settings-button";
+import type { User } from "@supabase/supabase-js";
+import MapboxMap from "@/components/MapboxMap";
+import { useRouter } from "next/navigation";
+import { commonFonts } from "@/lib/ui-setting";
 
 // Update the SettingsContent function to include the new fields and functionality
 export function SettingsContent() {
@@ -39,121 +53,205 @@ export function SettingsContent() {
     setForceShowPage,
     theme,
     setTheme,
-  } = useAppContext()
+    prayerTimes,
+  } = useAppContext();
 
-  const [localSettings, setLocalSettings] = useState(settings)
-  const [localSlides, setLocalSlides] = useState<string[]>(slides)
-  const [localCustomText, setLocalCustomText] = useState(customText)
-  const [localCustomTextStyle, setLocalCustomTextStyle] = useState(customTextStyle)
-  const [richTextContent, setRichTextContent] = useState("<p>Selamat datang di Masjid kami</p>")
-  const [originalPrayerTimes, setOriginalPrayerTimes] = useState<Record<PrayerName, string>>({
-    Fajr: "04:30",
-    Sunrise: "06:00",
-    Dhuhr: "12:00",
-    Asr: "15:00",
-    Maghrib: "18:00",
-    Isha: "19:30",
-  })
-  const [adjustedPrayerTimes, setAdjustedPrayerTimes] = useState<Record<PrayerName, string>>({
-    Fajr: "04:30",
-    Sunrise: "06:00",
-    Dhuhr: "12:00",
-    Asr: "15:00",
-    Maghrib: "18:00",
-    Isha: "19:30",
-  })
-  const [user, setUser] = useState<User | null>(null)
+  const [localSettings, setLocalSettings] = useState(settings);
+  const [localSlides, setLocalSlides] = useState<string[]>(slides);
+  const [localCustomText, setLocalCustomText] = useState(customText);
+  const [localCustomTextStyle, setLocalCustomTextStyle] =
+    useState(customTextStyle);
+  const [richTextContent, setRichTextContent] = useState(
+    "<p>Selamat datang di Masjid kami</p>"
+  );
+
+  // const [originalPrayerTimes, setOriginalPrayerTimes] = useState<Record<PrayerName, string>>({
+  //   Fajr: "04:30",
+  //   Sunrise: "06:00",
+  //   Dhuhr: "12:00",
+  //   Asr: "15:00",
+  //   Maghrib: "18:00",
+  //   Isha: "19:30",
+  // })
+
+  const [adjustedPrayerTimes, setAdjustedPrayerTimes] = useState<
+    Record<PrayerName, string>
+  >({
+    Fajr: "",
+    Sunrise: "",
+    Dhuhr: "",
+    Asr: "",
+    Maghrib: "",
+    Isha: "",
+  });
+
+  const [originalPrayerTimes, setOriginalPrayerTimes] = useState<
+    Record<PrayerName, string>
+  >({
+    Fajr: "",
+    Sunrise: "",
+    Dhuhr: "",
+    Asr: "",
+    Maghrib: "",
+    Isha: "",
+  });
+
+  const router = useRouter();
+
+  // MEMBUAT WAKTU ORIGINAL TANPA DI APPLY ADJUSTMENT
+  useEffect(() => {
+    const currentTime = new Date();
+    const originalTimes = calculatePrayerTimes(currentTime, settings, false);
+
+    if (!originalTimes || !Array.isArray(originalTimes)) return;
+
+    const originalPrayerTimesRecord: Record<PrayerName, string> = {
+      Fajr: "",
+      Sunrise: "",
+      Dhuhr: "",
+      Asr: "",
+      Maghrib: "",
+      Isha: "",
+    };
+
+    originalTimes.forEach((time) => {
+      if (time?.name && time?.time) {
+        originalPrayerTimesRecord[time.name] = time.time.toLocaleTimeString(
+          [],
+          {
+            hour: "2-digit",
+            minute: "2-digit",
+          }
+        );
+      }
+    });
+
+    setOriginalPrayerTimes(originalPrayerTimesRecord);
+  }, [prayerTimes]);
+
+  // MENGHITUNG ULANG WAKTU YANG DENGAN ADJUSTMENT
+  useEffect(() => {
+    if (prayerTimes) {
+      const prayerTimesRecord: Record<PrayerName, string> = {
+        Fajr: "",
+        Sunrise: "",
+        Dhuhr: "",
+        Asr: "",
+        Maghrib: "",
+        Isha: "",
+      };
+      prayerTimes.forEach((prayerTime) => {
+        prayerTimesRecord[prayerTime.name] = prayerTime.time.toLocaleTimeString(
+          [],
+          {
+            hour: "2-digit",
+            minute: "2-digit",
+          }
+        );
+      });
+
+      setAdjustedPrayerTimes(prayerTimesRecord);
+    }
+  }, [prayerTimes]);
+
+  // useEffect(() => {
+  //   setAdjustedPrayerTimes(originalPrayerTimes);
+  // }, [originalPrayerTimes]);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    setLocalSettings(settings)
-  }, [settings])
+    setLocalSettings(settings);
+  }, [settings]);
 
   useEffect(() => {
-    setLocalSlides(slides)
-  }, [slides])
+    setLocalSlides(slides);
+  }, [slides]);
 
   useEffect(() => {
-    setLocalCustomText(customText)
-    setRichTextContent(customText)
-  }, [customText])
+    setLocalCustomText(customText);
+    setRichTextContent(customText);
+  }, [customText]);
 
   useEffect(() => {
-    setLocalCustomTextStyle(customTextStyle)
-  }, [customTextStyle])
+    setLocalCustomTextStyle(customTextStyle);
+  }, [customTextStyle]);
 
   // Calculate adjusted prayer times based on original times and adjustments
   useEffect(() => {
-    const newAdjustedTimes: Record<PrayerName, string> = {} as Record<PrayerName, string>
+    const newAdjustedTimes: Record<PrayerName, string> = {} as Record<
+      PrayerName,
+      string
+    >;
 
-    Object.entries(originalPrayerTimes).forEach(([prayer, timeStr]) => {
-      const prayerName = prayer as PrayerName
-      const adjustment = localSettings.adjustments[prayerName]
+    Object.entries(adjustedPrayerTimes).forEach(([prayer, timeStr]) => {
+      const prayerName = prayer as PrayerName;
+      const adjustment = localSettings.adjustments[prayerName];
 
       // Parse the time string
-      const [hours, minutes] = timeStr.split(":").map(Number)
+      const [hours, minutes] = timeStr.split(":").map(Number);
 
       // Create a date object to handle time calculations
-      const date = new Date()
-      date.setHours(hours, minutes + adjustment, 0)
+      const date = new Date();
+      date.setHours(hours, minutes + adjustment, 0);
 
       // Format the adjusted time
-      const adjustedHours = date.getHours().toString().padStart(2, "0")
-      const adjustedMinutes = date.getMinutes().toString().padStart(2, "0")
+      const adjustedHours = date.getHours().toString().padStart(2, "0");
+      const adjustedMinutes = date.getMinutes().toString().padStart(2, "0");
 
-      newAdjustedTimes[prayerName] = `${adjustedHours}:${adjustedMinutes}`
-    })
+      newAdjustedTimes[prayerName] = `${adjustedHours}:${adjustedMinutes}`;
+    });
 
-    setAdjustedPrayerTimes(newAdjustedTimes)
-  }, [originalPrayerTimes, localSettings.adjustments])
+    // setAdjustedPrayerTimes(newAdjustedTimes)
+  }, [adjustedPrayerTimes, localSettings.adjustments]);
 
   const handleSave = () => {
-    updateSettings(localSettings)
-    updateSlides(localSlides)
-    updateCustomText(richTextContent)
-    updateCustomTextStyle(localCustomTextStyle)
+    updateSettings(localSettings);
+    updateSlides(localSlides);
+    updateCustomText(richTextContent);
+    updateCustomTextStyle(localCustomTextStyle);
 
     // Reset any forced page
-    setForceShowPage(null)
+    setForceShowPage(null);
 
-    alert("Pengaturan berhasil disimpan!")
-  }
+    alert("Pengaturan berhasil disimpan!");
+  };
 
   const handleAddSlide = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0]
-      const reader = new FileReader()
+      const file = e.target.files[0];
+      const reader = new FileReader();
 
       reader.onload = (event) => {
         if (event.target && typeof event.target.result === "string") {
-          setLocalSlides([...localSlides, event.target.result])
+          setLocalSlides([...localSlides, event.target.result]);
         }
-      }
+      };
 
-      reader.readAsDataURL(file)
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleRemoveSlide = (index: number) => {
-    setLocalSlides(localSlides.filter((_, i) => i !== index))
-  }
+    setLocalSlides(localSlides.filter((_, i) => i !== index));
+  };
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0]
-      const reader = new FileReader()
+      const file = e.target.files[0];
+      const reader = new FileReader();
 
       reader.onload = (event) => {
         if (event.target && typeof event.target.result === "string") {
           setLocalSettings({
             ...localSettings,
             mosqueLogo: event.target.result,
-          })
+          });
         }
-      }
+      };
 
-      reader.readAsDataURL(file)
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const detectLocation = () => {
     if (navigator.geolocation) {
@@ -165,30 +263,66 @@ export function SettingsContent() {
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
             },
-          })
+          });
         },
         (error) => {
-          alert(`Error getting location: ${error.message}`)
-        },
-      )
+          alert(`Error getting location: ${error.message}`);
+        }
+      );
     } else {
-      alert("Geolocation is not supported by this browser.")
+      alert("Geolocation is not supported by this browser.");
     }
-  }
+  };
 
   const adjustPrayerTime = (prayer: PrayerName, amount: number) => {
+    const currentTime = originalPrayerTimes[prayer];
+    const [hours, minutes] = currentTime.split(":").map(Number);
+    const date = new Date();
+    date.setHours(hours, minutes + amount, 0, 0);
+    const adjustedTime = date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    // Update local settings
     setLocalSettings({
       ...localSettings,
       adjustments: {
         ...localSettings.adjustments,
         [prayer]: localSettings.adjustments[prayer] + amount,
       },
-    })
-  }
+    });
+
+    // Update prayer times in appContext
+    const updatedPrayerTimes = prayerTimes.map((prayerTime) => {
+      if (prayerTime.name === prayer) {
+        return { ...prayerTime, time: date };
+      }
+      return prayerTime;
+    });
+    updateSettings({
+      ...localSettings,
+      adjustments: {
+        ...localSettings.adjustments,
+        [prayer]: localSettings.adjustments[prayer] + amount,
+      },
+    });
+    updateSlides(localSlides);
+    updateCustomText(richTextContent);
+    updateCustomTextStyle(localCustomTextStyle);
+    setForceShowPage(null);
+    updateSettings({
+      ...localSettings,
+      adjustments: {
+        ...localSettings.adjustments,
+        [prayer]: localSettings.adjustments[prayer] + amount,
+      },
+    });
+  };
 
   const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light")
-  }
+    setTheme(theme === "light" ? "dark" : "light");
+  };
 
   const updatePrayerCardStyle = (prayer: PrayerName, style: CardStyle) => {
     setLocalSettings({
@@ -197,19 +331,25 @@ export function SettingsContent() {
         ...localSettings.prayerCardStyles,
         [prayer]: style,
       },
-    })
-  }
+    });
+  };
 
   const handleAuthChange = (newUser: User | null) => {
-    setUser(newUser)
-  }
+    setUser(newUser);
+  };
 
   return (
     <div className="min-h-screen p-4 md:p-8 islamic-pattern">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center mb-6">
           <Link href="/app" className="mr-4">
-            <Button variant="outline" size="icon">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                window.location.href = "/app";
+              }}
+            >
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>
@@ -227,9 +367,17 @@ export function SettingsContent() {
               variant="outline"
               size="icon"
               onClick={toggleTheme}
-              aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+              aria-label={
+                theme === "light"
+                  ? "Switch to dark mode"
+                  : "Switch to light mode"
+              }
             >
-              {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+              {theme === "light" ? (
+                <Moon className="h-5 w-5" />
+              ) : (
+                <Sun className="h-5 w-5" />
+              )}
             </Button>
           </div>
         </div>
@@ -300,7 +448,9 @@ export function SettingsContent() {
                     <div className="flex-1">
                       <Label htmlFor="logo-upload" className="cursor-pointer">
                         <div className="border border-input rounded-md p-2 text-center hover:bg-muted/50 transition-colors">
-                          {localSettings.mosqueLogo ? "Ganti Logo" : "Unggah Logo"}
+                          {localSettings.mosqueLogo
+                            ? "Ganti Logo"
+                            : "Unggah Logo"}
                         </div>
                         <Input
                           id="logo-upload"
@@ -332,7 +482,9 @@ export function SettingsContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="after-iqamah-message">Pesan Setelah Iqamah</Label>
+                  <Label htmlFor="after-iqamah-message">
+                    Pesan Setelah Iqamah
+                  </Label>
                   <Input
                     id="after-iqamah-message"
                     value={localSettings.afterIqamahMessage}
@@ -346,7 +498,8 @@ export function SettingsContent() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="after-iqamah-duration">
-                    Durasi Estimasi Waktu Sholat (menit): {localSettings.afterIqamahDuration}
+                    Durasi Estimasi Waktu Sholat (menit):{" "}
+                    {localSettings.afterIqamahDuration}
                   </Label>
                   <Slider
                     id="after-iqamah-duration"
@@ -364,7 +517,8 @@ export function SettingsContent() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="after-prayer-duration">
-                    Durasi Halaman Kosong Setelah Sholat Selesai (menit): {localSettings.afterPrayerDuration}
+                    Durasi Halaman Kosong Setelah Sholat Selesai (menit):{" "}
+                    {localSettings.afterPrayerDuration}
                   </Label>
                   <Slider
                     id="after-prayer-duration"
@@ -407,45 +561,13 @@ export function SettingsContent() {
                       <SelectValue placeholder="Pilih jenis font" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Inter">
-                        <span style={{ fontFamily: "Inter" }}>Inter (Default)</span>
-                      </SelectItem>
-                      <SelectItem value="Arial">
-                        <span style={{ fontFamily: "Arial" }}>Arial</span>
-                      </SelectItem>
-                      <SelectItem value="Roboto">
-                        <span style={{ fontFamily: "Roboto" }}>Roboto</span>
-                      </SelectItem>
-                      <SelectItem value="Poppins">
-                        <span style={{ fontFamily: "Poppins" }}>Poppins</span>
-                      </SelectItem>
-                      <SelectItem value="Montserrat">
-                        <span style={{ fontFamily: "Montserrat" }}>Montserrat</span>
-                      </SelectItem>
-                      <SelectItem value="'Noto Sans'">
-                        <span style={{ fontFamily: "Noto Sans" }}>Noto Sans</span>
-                      </SelectItem>
-                      <SelectItem value="'Noto Serif'">
-                        <span style={{ fontFamily: "Noto Serif" }}>Noto Serif</span>
-                      </SelectItem>
-                      <SelectItem value="'Playfair Display'">
-                        <span style={{ fontFamily: "Playfair Display" }}>Playfair Display</span>
-                      </SelectItem>
-                      <SelectItem value="'Merriweather'">
-                        <span style={{ fontFamily: "Merriweather" }}>Merriweather</span>
-                      </SelectItem>
-                      <SelectItem value="'Lato'">
-                        <span style={{ fontFamily: "Lato" }}>Lato</span>
-                      </SelectItem>
-                      <SelectItem value="'Open Sans'">
-                        <span style={{ fontFamily: "Open Sans" }}>Open Sans</span>
-                      </SelectItem>
-                      <SelectItem value="'Raleway'">
-                        <span style={{ fontFamily: "Raleway" }}>Raleway</span>
-                      </SelectItem>
-                      <SelectItem value="'Nunito'">
-                        <span style={{ fontFamily: "Nunito" }}>Nunito</span>
-                      </SelectItem>
+                      {commonFonts.map((font) => (
+                        <SelectItem key={font.value} value={font.value}>
+                          <span style={{ fontFamily: font.value }}>
+                            {font.name}
+                          </span>
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -504,20 +626,23 @@ export function SettingsContent() {
                         localSettings.fontSize === "small"
                           ? "0.875rem"
                           : localSettings.fontSize === "large"
-                            ? "1.25rem"
-                            : "1rem",
+                          ? "1.25rem"
+                          : "1rem",
                     }}
                   >
                     <p>
-                      Ini adalah contoh teks dengan font {localSettings.fontFamily} dan ukuran{" "}
+                      Ini adalah contoh teks dengan font{" "}
+                      {localSettings.fontFamily} dan ukuran{" "}
                       {localSettings.fontSize === "small"
                         ? "kecil"
                         : localSettings.fontSize === "large"
-                          ? "besar"
-                          : "sedang"}
+                        ? "besar"
+                        : "sedang"}
                       .
                     </p>
-                    <p className="mt-2">Jadwal Sholat Masjid {localSettings.mosqueName}</p>
+                    <p className="mt-2">
+                      Jadwal Sholat Masjid {localSettings.mosqueName}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -529,7 +654,9 @@ export function SettingsContent() {
             <Card>
               <CardHeader>
                 <CardTitle>Pengaturan Background & Kartu</CardTitle>
-                <CardDescription>Atur background aplikasi dan kartu waktu sholat</CardDescription>
+                <CardDescription>
+                  Atur background aplikasi dan kartu waktu sholat
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
@@ -580,23 +707,34 @@ export function SettingsContent() {
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium">Kartu Waktu Sholat</h3>
                   <div className="space-y-4">
-                    {(["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"] as PrayerName[]).map((prayer) => (
+                    {(
+                      [
+                        "Fajr",
+                        "Sunrise",
+                        "Dhuhr",
+                        "Asr",
+                        "Maghrib",
+                        "Isha",
+                      ] as PrayerName[]
+                    ).map((prayer) => (
                       <CardCustomizer
                         key={prayer}
                         value={localSettings.prayerCardStyles[prayer]}
-                        onChange={(value) => updatePrayerCardStyle(prayer, value)}
+                        onChange={(value) =>
+                          updatePrayerCardStyle(prayer, value)
+                        }
                         label={
                           prayer === "Fajr"
                             ? "Subuh"
                             : prayer === "Sunrise"
-                              ? "Syuruq"
-                              : prayer === "Dhuhr"
-                                ? "Dzuhur"
-                                : prayer === "Asr"
-                                  ? "Ashar"
-                                  : prayer === "Maghrib"
-                                    ? "Maghrib"
-                                    : "Isya"
+                            ? "Syuruq"
+                            : prayer === "Dhuhr"
+                            ? "Dzuhur"
+                            : prayer === "Asr"
+                            ? "Ashar"
+                            : prayer === "Maghrib"
+                            ? "Maghrib"
+                            : "Isya"
                         }
                       />
                     ))}
@@ -610,7 +748,9 @@ export function SettingsContent() {
             <Card>
               <CardHeader>
                 <CardTitle>Pengaturan Jadwal Sholat</CardTitle>
-                <CardDescription>Atur lokasi dan penyesuaian waktu sholat</CardDescription>
+                <CardDescription>
+                  Atur lokasi dan penyesuaian waktu sholat
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Location Settings */}
@@ -670,7 +810,8 @@ export function SettingsContent() {
                   }}
                 />
 
-                <div className="space-y-2">
+                {/* WIP */}
+                {/* <div className="space-y-2">
                   <Label htmlFor="city-name">Nama Kota</Label>
                   <Input
                     id="city-name"
@@ -682,8 +823,8 @@ export function SettingsContent() {
                       })
                     }
                   />
-                </div>
-                <div className="space-y-2 mt-4">
+                </div> */}
+                {/* <div className="space-y-2 mt-4">
                   <Label htmlFor="calculation-method">Metode Perhitungan</Label>
                   <Select
                     value={localSettings.calculationMethod}
@@ -711,27 +852,43 @@ export function SettingsContent() {
                     Metode perhitungan yang berbeda menggunakan sudut matahari yang berbeda untuk menentukan waktu
                     sholat.
                   </p>
-                </div>
+                </div> */}
 
-                <h3 className="text-lg font-medium pt-4">Penyesuaian Waktu (menit)</h3>
+                <h3 className="text-lg font-medium pt-4">
+                  Penyesuaian Waktu (menit)
+                </h3>
                 <div className="space-y-4">
-                  {(["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"] as PrayerName[]).map((prayer) => (
-                    <div key={prayer} className="grid grid-cols-3 gap-2 items-center">
+                  {(
+                    [
+                      "Fajr",
+                      "Sunrise",
+                      "Dhuhr",
+                      "Asr",
+                      "Maghrib",
+                      "Isha",
+                    ] as PrayerName[]
+                  ).map((prayer) => (
+                    <div
+                      key={prayer}
+                      className="grid grid-cols-3 gap-2 items-center"
+                    >
                       <div>
                         <Label className="text-sm">
                           {prayer === "Fajr"
                             ? "Subuh"
                             : prayer === "Sunrise"
-                              ? "Syuruq"
-                              : prayer === "Dhuhr"
-                                ? "Dzuhur"
-                                : prayer === "Asr"
-                                  ? "Ashar"
-                                  : prayer === "Maghrib"
-                                    ? "Maghrib"
-                                    : "Isya"}
+                            ? "Syuruq"
+                            : prayer === "Dhuhr"
+                            ? "Dzuhur"
+                            : prayer === "Asr"
+                            ? "Ashar"
+                            : prayer === "Maghrib"
+                            ? "Maghrib"
+                            : "Isya"}
                         </Label>
-                        <div className="text-lg font-medium">{originalPrayerTimes[prayer]}</div>
+                        <div className="text-lg font-medium">
+                          {originalPrayerTimes[prayer]}
+                        </div>
                       </div>
 
                       <div className="flex items-center justify-center">
@@ -739,7 +896,7 @@ export function SettingsContent() {
                           variant="outline"
                           size="icon"
                           onClick={() => adjustPrayerTime(prayer, -1)}
-                          disabled={localSettings.adjustments[prayer] <= -15}
+                          disabled={localSettings.adjustments[prayer] <= -30}
                         >
                           <Minus className="h-4 w-4" />
                         </Button>
@@ -751,15 +908,29 @@ export function SettingsContent() {
                           variant="outline"
                           size="icon"
                           onClick={() => adjustPrayerTime(prayer, 1)}
-                          disabled={localSettings.adjustments[prayer] >= 15}
+                          disabled={localSettings.adjustments[prayer] >= 30}
                         >
                           <Plus className="h-4 w-4" />
                         </Button>
                       </div>
 
                       <div>
-                        <Label className="text-sm">Waktu Disesuaikan</Label>
-                        <div className="text-lg font-medium text-primary">{adjustedPrayerTimes[prayer]}</div>
+                        <Label className="text-sm">
+                          {prayer === "Fajr"
+                            ? "Subuh"
+                            : prayer === "Sunrise"
+                            ? "Syuruq"
+                            : prayer === "Dhuhr"
+                            ? "Dzuhur"
+                            : prayer === "Asr"
+                            ? "Ashar"
+                            : prayer === "Maghrib"
+                            ? "Maghrib"
+                            : "Isya"}
+                        </Label>
+                        <div className="text-lg font-medium text-primary">
+                          {adjustedPrayerTimes[prayer]}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -772,22 +943,29 @@ export function SettingsContent() {
             <Card>
               <CardHeader>
                 <CardTitle>Pengaturan Iqamah</CardTitle>
-                <CardDescription>Atur durasi waktu iqamah untuk setiap sholat</CardDescription>
+                <CardDescription>
+                  Atur durasi waktu iqamah untuk setiap sholat
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {(["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"] as Exclude<PrayerName, "Sunrise">[]).map((prayer) => (
+                  {(
+                    ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"] as Exclude<
+                      PrayerName,
+                      "Sunrise"
+                    >[]
+                  ).map((prayer) => (
                     <div key={prayer} className="space-y-2">
                       <Label htmlFor={`iqamah-${prayer}`}>
                         {prayer === "Fajr"
                           ? "Subuh"
                           : prayer === "Dhuhr"
-                            ? "Dzuhur"
-                            : prayer === "Asr"
-                              ? "Ashar"
-                              : prayer === "Maghrib"
-                                ? "Maghrib"
-                                : "Isya"}
+                          ? "Dzuhur"
+                          : prayer === "Asr"
+                          ? "Ashar"
+                          : prayer === "Maghrib"
+                          ? "Maghrib"
+                          : "Isya"}
                         : {localSettings.iqamahTimes[prayer]} menit
                       </Label>
                       <Slider
@@ -817,7 +995,9 @@ export function SettingsContent() {
             <Card>
               <CardHeader>
                 <CardTitle>Pengaturan Slide</CardTitle>
-                <CardDescription>Tambahkan gambar untuk ditampilkan di halaman jadwal</CardDescription>
+                <CardDescription>
+                  Tambahkan gambar untuk ditampilkan di halaman jadwal
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-4">
@@ -826,7 +1006,13 @@ export function SettingsContent() {
                       <Upload className="h-8 w-8 mx-auto mb-2 text-primary" />
                       <p>Klik untuk menambahkan gambar</p>
                     </div>
-                    <Input id="add-slide" type="file" accept="image/*" className="hidden" onChange={handleAddSlide} />
+                    <Input
+                      id="add-slide"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAddSlide}
+                    />
                   </Label>
                 </div>
 
@@ -861,17 +1047,25 @@ export function SettingsContent() {
             <Card>
               <CardHeader>
                 <CardTitle>Pengaturan Teks Kustom</CardTitle>
-                <CardDescription>Atur teks yang ditampilkan di bawah slide</CardDescription>
+                <CardDescription>
+                  Atur teks yang ditampilkan di bawah slide
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="custom-text">Teks Kustom</Label>
-                  <RichTextEditor value={richTextContent} onChange={setRichTextContent} />
+                  <RichTextEditor
+                    value={richTextContent}
+                    onChange={setRichTextContent}
+                  />
                 </div>
 
                 <div className="mt-4 p-4 border rounded-lg">
                   <h3 className="text-sm font-medium mb-2">Preview:</h3>
-                  <div className="p-4 bg-card rounded-lg" dangerouslySetInnerHTML={{ __html: richTextContent }} />
+                  <div
+                    className="p-4 bg-card rounded-lg"
+                    dangerouslySetInnerHTML={{ __html: richTextContent }}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -883,5 +1077,5 @@ export function SettingsContent() {
         </div>
       </div>
     </div>
-  )
+  );
 }

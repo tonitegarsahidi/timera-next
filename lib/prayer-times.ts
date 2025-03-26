@@ -60,7 +60,7 @@ const DEFAULT_SETTINGS: PrayerSettings = {
 }
 
 // Calculate prayer times with improved accuracy
-export function calculatePrayerTimes(date: Date, settings: PrayerSettings): PrayerTime[] {
+export function calculatePrayerTimes(date: Date, settings: PrayerSettings, isApplyAdjustment: boolean = true): PrayerTime[] {
   try {
     const coordinates = new Coordinates(
       settings.coordinates.latitude,
@@ -118,14 +118,17 @@ export function calculatePrayerTimes(date: Date, settings: PrayerSettings): Pray
       },
     ];
 
-    // Apply user adjustments
-    prayers.forEach((prayer) => {
-      if (settings.adjustments[prayer.name] !== undefined) {
-        const adjustedTime = new Date(prayer.time);
-        adjustedTime.setMinutes(prayer.time.getMinutes() + settings.adjustments[prayer.name]);
-        prayer.time = adjustedTime;
-      }
-    });
+    if (isApplyAdjustment) {
+      // Apply user adjustments
+      prayers.forEach((prayer) => {
+        if (settings.adjustments[prayer.name] !== undefined) {
+          const adjustedTime = new Date(prayer.time);
+          adjustedTime.setMinutes(prayer.time.getMinutes() + settings.adjustments[prayer.name]);
+          prayer.time = adjustedTime;
+        }
+      });
+    }
+
 
     // Sort by time
     prayers.sort((a, b) => a.time.getTime() - b.time.getTime());
@@ -258,7 +261,7 @@ export function getTimeSincePreviousPrayer(prevPrayer: PrayerTime | null): numbe
   if (!prevPrayer) return 0
 
   const now = new Date()
-  return now.getTime() - prevPrayer.time.getTime() 
+  return now.getTime() - prevPrayer.time.getTime()
 }
 
 export function getPreviousPrayer(prayerTimes: PrayerTime[]): PrayerTime | null {

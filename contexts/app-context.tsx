@@ -149,7 +149,7 @@ const defaultContextValue: AppContextType = {
   timeUntilNextPrayer: 0,
   currentSlideIndex: 0,
   setCurrentSlideIndex: () => {},
-  slides: ["/placeholder.svg?height=600&width=800", "/placeholder.svg?height=600&width=800"],
+  slides: ["/images/slide1.png?height=600&width=800", "/images/slide2.png?height=600&width=800"],
   updateSlides: () => {},
   isAdhanTime: false,
   isIqamahTime: false,
@@ -184,8 +184,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [timeSincePreviousPrayer, setTimeSincePreviousPrayer] = useState(0)
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0)
   const [slides, setSlides] = useState<string[]>([
-    "/placeholder.svg?height=600&width=800",
-    "/placeholder.svg?height=600&width=800",
+    "/images/slide1.png?height=600&width=800",
+    "/images/slide2.png?height=600&width=800",
   ])
   const [isAdhanTime, setIsAdhanTime] = useState(false)
   const [isIqamahTime, setIsIqamahTime] = useState(false)
