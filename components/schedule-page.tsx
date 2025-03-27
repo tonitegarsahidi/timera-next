@@ -205,7 +205,7 @@ export function SchedulePage() {
             </Card>
           )}
 
-          <div className="flex-1 grid grid-cols-1 gap-4">
+          <div className="flex-1 grid grid-cols-1 gap-3">
             {prayerTimes.map((prayer) => {
               // Determine if this is the current prayer
               const isCurrentPrayer = currentPrayer && prayer.name === currentPrayer.name
@@ -220,16 +220,16 @@ export function SchedulePage() {
                 <Card
                   key={prayer.name}
                   className={`prayer-time-card shadow-md overflow-hidden ${
-                    isNextPrayer ? "border-2 border-primary" : isCurrentPrayer ? "bg-primary/10" : ""
+                    isNextPrayer ? "border-4 border-red-900" : isCurrentPrayer ? "bg-primary/10" : ""
                   }`}
                   style={getCardStyle(prayerCardStyle)}
                 >
-                  <CardContent className="p-4 flex justify-between items-center backdrop-blur-sm bg-background/30">
+                  <CardContent className="py-4 px-9 flex justify-between items-center backdrop-blur-sm bg-background/30">
                     <div className="flex flex-col">
-                      <span className="text-lg font-medium">{prayer.indonesianName}</span>
-                      <span className="text-muted-foreground">{prayer.arabicName}</span>
+                      <span className="text-2xl font-medium">{prayer.indonesianName}</span>
+                      <span className="text-xl text-muted-foreground">{prayer.arabicName}</span>
                     </div>
-                    <span className="text-xxl font-bold tabular-nums">{formatTime(prayer.time)}</span>
+                    <span className="text-2xl  font-bold tabular-nums">{formatTime(prayer.time)}</span>
                   </CardContent>
                 </Card>
               )

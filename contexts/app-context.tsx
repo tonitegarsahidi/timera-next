@@ -117,7 +117,7 @@ const initialSettings: PrayerSettings = {
     Isha: 5,
   },
   mosqueName: "Masjid TimerA",
-  mosqueLogo: "",
+  mosqueLogo: "/images/timera-logo.png",
   mosqueDescription: "Jl. Contoh No. 123, Jakarta",
   afterIqamahMessage: "Lurus Rapatkan Shaf",
   afterIqamahDuration: 10,

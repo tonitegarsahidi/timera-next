@@ -79,11 +79,13 @@ export function CountdownPage() {
       </header>
 
       <div className="flex-1 flex flex-col items-center justify-center p-8" style={fontStyle}>
-        <h2 className="text-4xl md:text-6xl font-bold mb-8">Bersiap untuk Adzan {nextPrayer?.indonesianName}</h2>
+        <h2 className="text-4xl md:text-8xl font-bold mb-8">Bersiap untuk Adzan {nextPrayer?.indonesianName}</h2>
 
-        <div className="text-7xl md:text-9xl font-bold tabular-nums mb-8">{formatTimeUntil(countdown)}</div>
+        <div className="text-8xl sm:text-9xl md:text-[12rem] lg:text-[20rem] font-bold tabular-nums leading-none mb-8">
+          {formatTimeUntil(countdown)}
+          </div>
 
-        <p className="text-2xl md:text-3xl text-muted-foreground">
+        <p className="text-2xl md:text-4xl text-muted-foreground">
           {countdown > 0 ? "Persiapkan diri untuk sholat" : "Waktunya Adzan"}
         </p>
       </div>

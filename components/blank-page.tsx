@@ -40,7 +40,7 @@ export function BlankPage() {
           {settings.mosqueLogo ? (
             <div className="relative w-24 h-24 mb-4">
               <Image
-                src={settings.mosqueLogo || "/placeholder.svg"}
+                src={settings.mosqueLogo || "/images/logo-timera.png"}
                 alt={settings.mosqueName}
                 width={96}
                 height={96}
@@ -48,7 +48,14 @@ export function BlankPage() {
               />
             </div>
           ) : (
-            <div className="mosque-dome"></div>
+            // <div className="mosque-dome"></div>
+            <Image
+                src="/images/timera-logo.png"
+                alt={settings.mosqueName}
+                width={96}
+                height={96}
+                className="object-contain"
+              />
           )}
         </div>
         <h1 className="text-4xl md:text-6xl font-bold mb-4">{settings.mosqueName}</h1>

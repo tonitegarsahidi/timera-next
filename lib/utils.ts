@@ -14,3 +14,12 @@ export function formatTimeWithSeconds(date: Date): string  {
   })
   .replace(/\./g, " : "); // Ganti semua titik dengan colon
 }
+
+export function formatTimeWithoutSeconds(date: Date): string  {
+  return date.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  })
+  .replace(/\./g, " : "); // Ganti semua titik dengan colon
+}

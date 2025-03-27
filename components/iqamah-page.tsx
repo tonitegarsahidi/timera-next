@@ -7,7 +7,7 @@ import { formatTimeUntilMinutes, getPreviousPrayer } from "@/lib/prayer-times";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import type { BackgroundSetting } from "@/contexts/app-context";
-import { formatTimeWithSeconds } from "@/lib/utils";
+import { formatTimeWithoutSeconds, formatTimeWithSeconds } from "@/lib/utils";
 
 // Helper function to generate background style
 function getBackgroundStyle(bg: BackgroundSetting): React.CSSProperties {
@@ -110,19 +110,19 @@ export function IqamahPage() {
         {!isAfterIqamah ? (
           <>
             {isAdhanTime ? (
-              <h2 className="text-4xl md:text-6xl font-bold mb-8">
+              <h1 className="text-4xl md:text-6xl font-bold mb-8">
                 Adzan {previousPrayer?.indonesianName}
-              </h2>
+              </h1>
             ) : (
               <>
-                <h2 className="text-4xl md:text-6xl font-bold mb-8">
+                <h2 className="text-4xl sm:text-4xl md:text-8xl font-bold mb-8">
                   Iqamah {previousPrayer?.indonesianName}
                 </h2>
-                <div className="text-7xl md:text-9xl font-bold tabular-nums mb-8">
+                <div className="text-8xl sm:text-9xl md:text-[12rem] lg:text-[20rem] font-bold tabular-nums leading-none mb-8">
+
                   {formatTimeUntilMinutes(countdown)}
                 </div>
-
-                <p className="text-2xl md:text-3xl text-muted-foreground">
+                <p className="text-2xl md:text-4xl text-muted-foreground">
                   Bersiap untuk sholat berjamaah
                 </p>
               </>
@@ -130,11 +130,11 @@ export function IqamahPage() {
           </>
         ) : (
           <>
-          <h2 className="text-4xl md:text-6xl font-bold text-center">
+          <h2 className="text-4xl md:text-9xl font-bold text-center">
             {settings.afterIqamahMessage}
           </h2>
-          <p>____</p>
-          <p className="text-2xl md:text-3xl text-muted-foreground">
+          
+          <p className="text-2xl md:text-8xl text-muted-foreground mt-20">
             {formatTimeWithSeconds(currentTime)}
                 </p>
           </>
