@@ -11,28 +11,30 @@ export default function Auth() {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-
   useEffect(() => {
-    setLoading(true)
-
+    setLoading(true);
+  
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event: AuthChangeEvent, session: Session | null) => {
-        setUser(session?.user ?? null)
-
-        if (session?.user) {
-          syncSettingsWithDexie(session.user.id)
-          syncSlidesWithDexie(session.user.id)
-
-          // Redirect ke halaman utama setelah login sukses
-          router.replace("/")
+        console.log("Auth event:", event); // Debugging
+  
+        setUser(session?.user ?? null);
+  
+        if (event === "SIGNED_IN") {
+          syncSettingsWithDexie(session!.user.id);
+          syncSlidesWithDexie(session!.user.id);
+  
+          router.replace("/");
         }
+  
+        setLoading(false);
       }
-    )
-
+    );
+  
     return () => {
-      authListener.subscription.unsubscribe()
-    }
-  }, [router])
+      authListener.subscription.unsubscribe();
+    };
+  }, [router]);
 
   // Jika masih loading, tampilkan indikator atau kosongkan
   if (loading) return <p>Loading...</p>

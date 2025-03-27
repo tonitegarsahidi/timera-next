@@ -442,6 +442,7 @@ export default function LandingPage() {
       <div className="mb-6 md:mb-0">
         <h2 className="text-2xl font-bold">TimerA</h2>
         <p className="text-gray-400">Jadwal Sholat Digital untuk Masjid</p>
+        <p className="text-gray-400">Versi 0.1.1</p>
       </div>
       <div className="flex flex-col md:flex-row gap-4 md:gap-8">
         <Link href="/app" className="text-gray-300 hover:text-white">

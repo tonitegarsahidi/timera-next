@@ -11,29 +11,30 @@ import { Login } from "@/components/login"
 export default function AppSettingsPage() {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [loading, setLoading] = useState(true)
+  const [authListener, setAuthListener] = useState<any>(null)
+
   const supabase = getSupabaseClient()
 
   useEffect(() => {
     const checkAuth = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      setUser(user)
+      const { data } = await supabase.auth.getSession() // Ambil session dari cache
+      setUser(data.session?.user ?? null)
       setLoading(false)
     }
 
     checkAuth()
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null)
-    })
+    if (!authListener) {
+      const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+        setUser(session?.user ?? null)
+      })
+      setAuthListener(listener)
+    }
 
     return () => {
-      subscription.unsubscribe()
+      authListener?.subscription.unsubscribe()
     }
-  }, [supabase])
+  }, [supabase, authListener])
 
   if (loading) return null
 
