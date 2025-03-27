@@ -110,7 +110,7 @@ export function IqamahPage() {
         {!isAfterIqamah ? (
           <>
             {isAdhanTime ? (
-              <h1 className="text-4xl md:text-6xl font-bold mb-8">
+              <h1 className="text-9xl md:text-9xl font-bold mb-8">
                 Adzan {previousPrayer?.indonesianName}
               </h1>
             ) : (

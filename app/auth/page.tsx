@@ -41,6 +41,7 @@ export default function Auth() {
 
   return <div>
   <h1>Auth Page</h1>
-  {user ? <pre>{JSON.stringify(user, null, 2)}</pre> : <p>Loading user...</p>}
+  {/* {user ? <pre>{JSON.stringify(user, null, 2)}</pre> : <p>Loading user...</p>} */}
+  {user ? <pre>Please wait, we will redirect you... </pre> : <p>Loading user...</p>}
 </div>
 }
