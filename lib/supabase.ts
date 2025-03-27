@@ -12,7 +12,6 @@ const createSupabaseClient = () => {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
-      storage: localStorage // Memastikan sesi disimpan di localStorage
     }
   })
 }
