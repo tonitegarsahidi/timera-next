@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { calculatePrayerTimes, type PrayerName } from "@/lib/prayer-times";
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Upload, X, Minus, Plus, Sun, Moon } from "lucide-react";
+import { ArrowLeft, Upload, X, Minus, Plus, Sun, Moon, Locate } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -257,13 +257,14 @@ export function SettingsContent() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setLocalSettings({
-            ...localSettings,
+          setLocalSettings((prevSettings) => ({
+            ...prevSettings,
             coordinates: {
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
             },
-          });
+          }));
+          console.log("GeoLocation Detected : " + position.coords.latitude + " AND " + position.coords.longitude)
         },
         (error) => {
           alert(`Error getting location: ${error.message}`);
@@ -795,6 +796,16 @@ export function SettingsContent() {
                     </div>
                   </div>
                 </div>
+
+                {/* Detect Location Button */}
+                <Button
+                  variant="default"
+                  onClick={detectLocation}
+                  className="w-full"
+                >
+                    <Locate className="h-5 w-5" /> 
+                  Deteksi Lokasi Saya
+                </Button>
 
                 <MapboxMap
                   initialCoordinates={localSettings.coordinates}

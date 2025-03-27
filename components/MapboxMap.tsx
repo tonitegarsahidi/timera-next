@@ -47,15 +47,16 @@ const MapboxMap: React.FC<MapboxMapProps> = ({ initialCoordinates, accessToken, 
   }, []);
 
   useEffect(() => {
-    // Update marker position when initialCoordinates change
+    // Update map center and marker position when initialCoordinates change
     if (map.current && marker.current) {
       map.current.flyTo({
-        center: [coordinates.longitude, coordinates.latitude],
+        center: [initialCoordinates.longitude, initialCoordinates.latitude],
         essential: true,
       });
-      marker.current.setLngLat([coordinates.longitude, coordinates.latitude]);
+      marker.current.setLngLat([initialCoordinates.longitude, initialCoordinates.latitude]);
+      setCoordinates(initialCoordinates);
     }
-  }, [coordinates.latitude, coordinates.longitude]);
+  }, [initialCoordinates.latitude, initialCoordinates.longitude]);
 
 
   return (
