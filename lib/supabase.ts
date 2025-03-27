@@ -7,7 +7,14 @@ const createSupabaseClient = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
 
-  return createClient(supabaseUrl, supabaseAnonKey)
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: localStorage // Memastikan sesi disimpan di localStorage
+    }
+  })
 }
 
 // Singleton pattern untuk client-side Supabase client
@@ -15,6 +22,7 @@ let supabaseClient: ReturnType<typeof createSupabaseClient> | null = null
 
 export const getSupabaseClient = () => {
   if (!supabaseClient) {
+    console.log("Initializing Supabase Client") // Tambahkan log untuk debug
     supabaseClient = createSupabaseClient()
   }
   return supabaseClient

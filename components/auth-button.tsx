@@ -23,45 +23,48 @@ export function AuthButton({ onAuthChange }: AuthButtonProps) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [loading, setLoading] = useState(true)
   const userRef = useRef<SupabaseUser | null>(null)
+  const listenerRef = useRef<boolean>(false) // ⬅️ Cegah duplikasi listener
   const supabase = getSupabaseClient()
 
-  // 1️⃣ Hanya ambil user pertama kali
+  // Ambil user pertama kali
   useEffect(() => {
     const checkUser = async () => {
       setLoading(true)
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data } = await supabase.auth.getSession()
 
-      // Update hanya jika user berubah
-      if (user?.id !== userRef.current?.id) {
-        userRef.current = user
-        setUser(user)
-        if (onAuthChange) onAuthChange(user)
+      if (data.session?.user?.id !== userRef.current?.id) {
+        userRef.current = data.session?.user || null
+        setUser(userRef.current)
+        onAuthChange?.(userRef.current)
       }
+
       setLoading(false)
     }
 
     checkUser()
-  }, []) // ⬅️ Hanya dijalankan sekali saat mount
+  }, []) // ⬅️ Pastikan hanya dipanggil sekali
 
-  // 2️⃣ Hanya update user jika `onAuthStateChange` berubah
+  // Pastikan `onAuthStateChange` hanya dijalankan sekali
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        const newUser = session?.user ?? null
+    if (listenerRef.current) return // ⬅️ Cegah listener dobel
 
-        // Hindari update jika user tidak berubah
-        if (newUser?.id !== userRef.current?.id) {
-          userRef.current = newUser
-          setUser(newUser)
-          if (onAuthChange) onAuthChange(newUser)
-        }
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      const newUser = session?.user ?? null
+
+      if (newUser?.id !== userRef.current?.id) {
+        userRef.current = newUser
+        setUser(newUser)
+        onAuthChange?.(newUser)
       }
-    )
+    })
+
+    listenerRef.current = true // ⬅️ Tandai bahwa listener sudah dibuat
 
     return () => {
       authListener.subscription.unsubscribe()
+      listenerRef.current = false // ⬅️ Reset saat unmount
     }
-  }, [onAuthChange]) // ⬅️ Tidak pakai `supabase`, agar tidak trigger loop
+  }, [onAuthChange]) // ⬅️ Pastikan tidak bergantung ke `supabase`
 
   const handleSignIn = async () => {
     setLoading(true)
@@ -74,6 +77,7 @@ export function AuthButton({ onAuthChange }: AuthButtonProps) {
   const handleSignOut = async () => {
     setLoading(true)
     await supabase.auth.signOut()
+    setUser(null)
     setLoading(false)
   }
 
