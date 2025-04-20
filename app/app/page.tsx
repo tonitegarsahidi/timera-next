@@ -25,7 +25,11 @@ function AppContent() {
   const { currentPage, forceShowPage, setForceShowPage } = useAppContext();
 
   const searchParams = useSearchParams();
-  const isDebug = searchParams.get("isDebug") === "true"; // Cek apakah isDebug=true
+  const isDebug = searchParams.get("isDebug") === "true" 
+                || searchParams.get("IsDebug") === "true" 
+                || searchParams.get("isdebug") === "true" 
+                || searchParams.get("ISDEBUG") === "true"; 
+                // Cek apakah isDebug=true
 
   // If a page is forced to be shown, show it
   const displayPage = forceShowPage || currentPage;

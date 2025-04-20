@@ -79,9 +79,9 @@ export function CountdownPage() {
       </header>
 
       <div className="flex-1 flex flex-col items-center justify-center p-8" style={fontStyle}>
-        <h2 className="text-4xl md:text-8xl font-bold mb-8">Bersiap untuk Adzan {nextPrayer?.indonesianName}</h2>
+        <h2 className="text-4xl md:text-8xl font-bold mb-8 androidtv:mb-4 androidtv:text-5xl">Bersiap untuk Adzan {nextPrayer?.indonesianName}</h2>
 
-        <div className="text-8xl sm:text-9xl md:text-[12rem] lg:text-[20rem] font-bold tabular-nums leading-none mb-8">
+        <div className="text-8xl md:text-[12rem] lg:text-[20rem]  androidtv:text-[10rem] font-bold tabular-nums leading-none mb-8 androidtv:mb-4">
           {formatTimeUntil(countdown)}
           </div>
 

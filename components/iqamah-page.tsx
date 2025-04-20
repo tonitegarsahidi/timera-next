@@ -31,14 +31,17 @@ export function IqamahPage() {
     iqamahTimeRemaining,
     afterIqamahTimeRemaining,
     isAdhanTime,
-    currentTime
   } = useAppContext();
 
   const [countdown, setCountdown] = useState(iqamahTimeRemaining);
+   const [currentTime, setCurrentTime] = useState<Date | null>(null)
   const isAfterIqamah = iqamahTimeRemaining <= 0;
 
   useEffect(() => {
+    setCurrentTime(new Date());
+
     const interval = setInterval(() => {
+      setCurrentTime(new Date());
       setCountdown((prev) => Math.max(0, prev - 1000));
     }, 1000);
     return () => clearInterval(interval);
@@ -130,11 +133,11 @@ export function IqamahPage() {
           </>
         ) : (
           <>
-          <h2 className="text-4xl md:text-9xl font-bold text-center">
+          <h2 className="text-4xl md:text-9xl androidtv:text-7xl font-bold text-center">
             {settings.afterIqamahMessage}
           </h2>
           
-          <p className="text-2xl md:text-8xl text-muted-foreground mt-20">
+          <p className="text-2xl md:text-8xl androidtv:text-6xl text-muted-foreground mt-20 androidtv:mt-10">
             {formatTimeWithSeconds(currentTime)}
                 </p>
           </>
