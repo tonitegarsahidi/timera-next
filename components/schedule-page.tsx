@@ -39,7 +39,6 @@ function getCardStyle(style: CardStyle): React.CSSProperties {
 export function SchedulePage() {
   const {
     prayerTimes,
-    currentTime,
     currentSlideIndex,
     setCurrentSlideIndex,
     slides,
@@ -52,10 +51,15 @@ export function SchedulePage() {
   } = useAppContext()
 
   const [countdown, setCountdown] = useState(timeUntilNextPrayer)
+  const [currentTime, setCurrentTime] = useState<Date | null>(null)
 
   // Update countdown every second
   useEffect(() => {
+    // Set waktu pertama kali
+    setCurrentTime(new Date());
+
     const interval = setInterval(() => {
+      setCurrentTime(new Date())
       setCountdown((prev) => Math.max(0, prev - 1000))
     }, 1000)
     return () => clearInterval(interval)
@@ -93,7 +97,7 @@ export function SchedulePage() {
           : appBackgroundStyle
       }
     >
-      <header className="w-full bg-primary/20 p-8 text-center">
+      <header className="w-full bg-primary/20 p-8 androidtv:p-1 text-center">
         <div className="flex items-center justify-center gap-3">
           {settings.mosqueLogo && (
             <div className="relative w-20 h-20">
@@ -107,9 +111,9 @@ export function SchedulePage() {
             </div>
           )}
           <div>
-            <h1 className="text-5xl font-bold">{settings.mosqueName}</h1>
+            <h1 className="text-5xl font-bold androidtv:text-3xl">{settings.mosqueName}</h1>
             {settings.mosqueDescription && (
-              <p className="text-xl mt-2">{settings.mosqueDescription}</p>
+              <p className="text-xl mt-2 androidtv:text-lg androidtv:mt-0">{settings.mosqueDescription}</p>
             )}
           </div>
         </div>
@@ -180,12 +184,12 @@ export function SchedulePage() {
         {/* Right side - Prayer times (1/3 of screen) */}
         <div className="md:w-2/5 flex flex-col gap-4">
           <Card className="shadow-lg overflow-hidden" style={getCardStyle(settings.currentTimeCardStyle)}>
-            <CardContent className="p-4 flex flex-col items-center backdrop-blur-sm bg-background/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="h-5 w-5 text-primary" />
-                <span className="text-lg font-medium">Waktu Sekarang</span>
+            <CardContent className="p-4 flex flex-col items-center backdrop-blur-sm bg-background/30 androidtv:p-1">
+              <div className="flex items-center gap-2 mb-2 androidtv:mb-0">
+                <Clock className="h-5 w-5 text-primary"  />
+                <span className="text-lg font-medium androidtv:text-sm">Waktu Sekarang</span>
               </div>
-              <span className="text-5xl font-bold tabular-nums">{formatTimeWithSeconds(currentTime)}</span>
+              <span className="text-5xl font-bold tabular-nums androidtv:text-3xl">{formatTimeWithSeconds(currentTime)}</span>
             </CardContent>
           </Card>
 
@@ -195,17 +199,17 @@ export function SchedulePage() {
               className="shadow-lg bg-primary/5 border-primary overflow-hidden"
               style={getCardStyle(settings.countdownCardStyle)}
             >
-              <CardContent className="p-4 flex flex-col items-center backdrop-blur-sm bg-background/30">
-                <div className="flex items-center gap-2 mb-2">
+              <CardContent className="p-4 flex flex-col items-center backdrop-blur-sm bg-background/30 androidtv:p-1">
+                <div className="flex items-center gap-2 mb-2 androidtv:mb-0">
                   <Timer className="h-5 w-5 text-primary" />
                   <span className="text-lg font-medium">Menuju {nextPrayer.indonesianName}</span>
                 </div>
-                <span className="text-3xl font-bold tabular-nums">{formatTimeCountdownDetail(countdown)}</span>
+                <span className="text-3xl font-bold tabular-nums androidtv:text-2xl">{formatTimeCountdownDetail(countdown)}</span>
               </CardContent>
             </Card>
           )}
 
-          <div className="flex-1 grid grid-cols-1 gap-3">
+          <div className="flex-1 grid grid-cols-1 androidtv:grid-cols-2 gap-3">
             {prayerTimes.map((prayer) => {
               // Determine if this is the current prayer
               const isCurrentPrayer = currentPrayer && prayer.name === currentPrayer.name
@@ -224,10 +228,10 @@ export function SchedulePage() {
                   }`}
                   style={getCardStyle(prayerCardStyle)}
                 >
-                  <CardContent className="py-4 px-9 flex justify-between items-center backdrop-blur-sm bg-background/30">
+                  <CardContent className="py-4 px-9 androidtv:py-1 androidtv:px-3 flex justify-between items-center androidtv:items-start backdrop-blur-sm bg-background/30">
                     <div className="flex flex-col">
-                      <span className="text-2xl font-medium">{prayer.indonesianName}</span>
-                      <span className="text-xl text-muted-foreground">{prayer.arabicName}</span>
+                      <span className="text-2xl font-medium  androidtv:text-xl">{prayer.indonesianName}</span>
+                      <span className="text-xl text-muted-foreground  androidtv:text-lg">{prayer.arabicName}</span>
                     </div>
                     <span className="text-2xl  font-bold tabular-nums">{formatTime(prayer.time)}</span>
                   </CardContent>
