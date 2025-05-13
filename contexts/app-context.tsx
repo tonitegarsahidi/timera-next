@@ -381,7 +381,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setCurrentPage("blank")
     }
     // 10 minutes before next prayer time
-    else if (timeUntilNextPrayer <= 10 * 60 * 1000 && timeUntilNextPrayer > 0) {
+    else if (timeUntilNextPrayer <= 30 * 60 * 1000 && timeUntilNextPrayer > 0) {
       setCurrentPage("countdown")
       setIsAdhanTime(false)
       setIsIqamahTime(false)
