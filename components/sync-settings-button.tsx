@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { useAppContext } from "@/contexts/app-context"
 import {
-  saveSettingsToSupabase,
-  saveSlidesToSupabase,
-  getSettingsFromSupabase,
-  getSlidesFromSupabase,
-} from "@/lib/supabase"
+  saveSettingsToFirestore,
+  saveSlidesToFirestore,
+  getSettingsFromFirestore,
+  getSlidesFromFirestore,
+} from "@/lib/firestore" // Mengubah import ke firestore
 import { Cloud, Download, Upload, Loader2 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import type { User } from "@supabase/supabase-js"
+import type { User } from "firebase/auth" // Mengubah tipe User ke Firebase User
 
 interface SyncSettingsButtonProps {
   user: User | null
@@ -30,8 +30,8 @@ export function SyncSettingsButton({ user }: SyncSettingsButtonProps) {
   const handleUploadSettings = async () => {
     try {
       setLoading(true)
-      await saveSettingsToSupabase(user.id, settings)
-      await saveSlidesToSupabase(user.id, slides)
+      await saveSettingsToFirestore(user.uid, settings) // Menggunakan user.uid
+      await saveSlidesToFirestore(user.uid, slides) // Menggunakan user.uid
       toast({
         title: "Sinkronisasi berhasil",
         description: "Pengaturan dan slide berhasil disimpan ke cloud",
@@ -51,8 +51,8 @@ export function SyncSettingsButton({ user }: SyncSettingsButtonProps) {
   const handleDownloadSettings = async () => {
     try {
       setLoading(true)
-      const savedSettings = await getSettingsFromSupabase(user.id)
-      const savedSlides = await getSlidesFromSupabase(user.id)
+      const savedSettings = await getSettingsFromFirestore(user.uid) // Menggunakan user.uid
+      const savedSlides = await getSlidesFromFirestore(user.uid) // Menggunakan user.uid
 
       if (savedSettings) {
         updateSettings(savedSettings)

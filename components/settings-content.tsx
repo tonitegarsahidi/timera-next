@@ -34,10 +34,11 @@ import type { CardStyle } from "@/contexts/app-context";
 import type { CalculationMethodName } from "@/lib/prayer-times";
 import { AuthButton } from "@/components/auth-button";
 import { SyncSettingsButton } from "@/components/sync-settings-button";
-import type { User } from "@supabase/supabase-js";
+import type { User } from "firebase/auth"; // Mengubah tipe User ke Firebase User
 import MapboxMap from "@/components/MapboxMap";
 import { useRouter } from "next/navigation";
 import { commonFonts } from "@/lib/ui-setting";
+import { SlideItem } from "@/lib/db"; // Menambahkan import SlideItem
 
 // Update the SettingsContent function to include the new fields and functionality
 export function SettingsContent() {
@@ -57,7 +58,7 @@ export function SettingsContent() {
   } = useAppContext();
 
   const [localSettings, setLocalSettings] = useState(settings);
-  const [localSlides, setLocalSlides] = useState<string[]>(slides);
+  const [localSlides, setLocalSlides] = useState<SlideItem[]>(slides); // Mengubah tipe localSlides
   const [localCustomText, setLocalCustomText] = useState(customText);
   const [localCustomTextStyle, setLocalCustomTextStyle] =
     useState(customTextStyle);
@@ -223,7 +224,13 @@ export function SettingsContent() {
 
       reader.onload = (event) => {
         if (event.target && typeof event.target.result === "string") {
-          setLocalSlides([...localSlides, event.target.result]);
+          // Membuat SlideItem baru dengan ID unik
+          const newSlide: SlideItem = {
+            id: localSlides.length > 0 ? Math.max(...localSlides.map(s => s.id || 0)) + 1 : 1,
+            src: event.target.result,
+            order: localSlides.length,
+          };
+          setLocalSlides([...localSlides, newSlide]);
         }
       };
 
@@ -1029,10 +1036,10 @@ export function SettingsContent() {
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {localSlides.map((slide, index) => (
-                    <div key={index} className="relative group">
+                    <div key={slide.id || index} className="relative group"> {/* Menggunakan slide.id sebagai key */}
                       <div className="aspect-video rounded-lg overflow-hidden bg-muted">
                         <Image
-                          src={slide || "/placeholder.svg"}
+                          src={String(slide.src) || "/placeholder.svg"} // Memastikan src adalah string
                           alt={`Slide ${index + 1}`}
                           width={300}
                           height={200}
