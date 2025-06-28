@@ -130,7 +130,7 @@ export function SchedulePage() {
               {slides.length > 0 && (
                 <div className="relative w-full h-full">
                   <Image
-                    src={slides[currentSlideIndex] || "/placeholder.svg?height=600&width=800"}
+                    src={slides[currentSlideIndex]?.src || "/placeholder.svg"}
                     alt="Slide"
                     fill
                     style={{ objectFit: "cover" }}

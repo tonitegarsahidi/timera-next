@@ -12,7 +12,7 @@ import {
   type PrayerName,
   getTimeSincePreviousPrayer,
 } from "@/lib/prayer-times"
-import { saveSettings, getSettings, saveSlides, getSlides } from "@/lib/db"
+import { saveSettings, getSettings, saveSlides, getSlides, SlideItem } from "@/lib/db"
 
 // Define the AppPage type
 type AppPage = "schedule" | "countdown" | "iqamah" | "blank"
@@ -59,8 +59,8 @@ interface AppContextType {
   timeUntilNextPrayer: number
   currentSlideIndex: number
   setCurrentSlideIndex: (index: number) => void
-  slides: string[]
-  updateSlides: (slides: string[]) => void
+  slides: SlideItem[] // Mengubah tipe slides menjadi SlideItem[]
+  updateSlides: (slides: SlideItem[]) => void // Mengubah tipe parameter updateSlides
   isAdhanTime: boolean
   isIqamahTime: boolean
   iqamahTimeRemaining: number
@@ -149,7 +149,10 @@ const defaultContextValue: AppContextType = {
   timeUntilNextPrayer: 0,
   currentSlideIndex: 0,
   setCurrentSlideIndex: () => {},
-  slides: ["/images/slide1.png?height=600&width=800", "/images/slide2.png?height=600&width=800"],
+  slides: [
+    { id: 1, src: "/images/slide1.png", order: 0 }, // Menghapus query parameters
+    { id: 2, src: "/images/slide2.png", order: 1 }, // Menghapus query parameters
+  ],
   updateSlides: () => {},
   isAdhanTime: false,
   isIqamahTime: false,
@@ -183,9 +186,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [timeUntilNextPrayer, setTimeUntilNextPrayer] = useState(0)
   const [timeSincePreviousPrayer, setTimeSincePreviousPrayer] = useState(0)
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0)
-  const [slides, setSlides] = useState<string[]>([
-    "/images/slide1.png?height=600&width=800",
-    "/images/slide2.png?height=600&width=800",
+  const [slides, setSlides] = useState<SlideItem[]>([
+    { id: 1, src: "/images/slide1.png", order: 0 }, // Menghapus query parameters
+    { id: 2, src: "/images/slide2.png", order: 1 }, // Menghapus query parameters
   ])
   const [isAdhanTime, setIsAdhanTime] = useState(false)
   const [isIqamahTime, setIsIqamahTime] = useState(false)
@@ -401,7 +404,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const updateSlides = async (newSlides: string[]) => {
+  const updateSlides = async (newSlides: SlideItem[]) => { // Mengubah tipe parameter newSlides
     setSlides(newSlides)
     if (isDbInitialized) {
       await saveSlides(newSlides)

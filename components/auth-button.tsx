@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { getSupabaseClient } from "@/lib/supabase"
 import { User, LogOut, Loader2 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -13,72 +12,53 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import type { User as SupabaseUser } from "@supabase/supabase-js"
+import { auth } from "@/lib/firebase"
+import { onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, User as FirebaseUser } from "firebase/auth"
 
 interface AuthButtonProps {
-  onAuthChange?: (user: SupabaseUser | null) => void
+  onAuthChange?: (user: FirebaseUser | null) => void
 }
 
 export function AuthButton({ onAuthChange }: AuthButtonProps) {
-  const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [user, setUser] = useState<FirebaseUser | null>(null)
   const [loading, setLoading] = useState(true)
-  const userRef = useRef<SupabaseUser | null>(null)
-  const listenerRef = useRef<boolean>(false) // ⬅️ Cegah duplikasi listener
-  const supabase = getSupabaseClient()
+  const userRef = useRef<FirebaseUser | null>(null)
 
-  // Ambil user pertama kali
   useEffect(() => {
-    const checkUser = async () => {
-      setLoading(true)
-      const { data } = await supabase.auth.getSession()
-
-      if (data.session?.user?.id !== userRef.current?.id) {
-        userRef.current = data.session?.user || null
-        setUser(userRef.current)
-        onAuthChange?.(userRef.current)
+    setLoading(true)
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser?.uid !== userRef.current?.uid) {
+        userRef.current = firebaseUser
+        setUser(firebaseUser)
+        onAuthChange?.(firebaseUser)
       }
-
       setLoading(false)
-    }
-
-    checkUser()
-  }, []) // ⬅️ Pastikan hanya dipanggil sekali
-
-  // Pastikan `onAuthStateChange` hanya dijalankan sekali
-  useEffect(() => {
-    if (listenerRef.current) return // ⬅️ Cegah listener dobel
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      const newUser = session?.user ?? null
-
-      if (newUser?.id !== userRef.current?.id) {
-        userRef.current = newUser
-        setUser(newUser)
-        onAuthChange?.(newUser)
-      }
     })
 
-    listenerRef.current = true // ⬅️ Tandai bahwa listener sudah dibuat
-
-    return () => {
-      authListener.subscription.unsubscribe()
-      listenerRef.current = false // ⬅️ Reset saat unmount
-    }
-  }, [onAuthChange]) // ⬅️ Pastikan tidak bergantung ke `supabase`
+    return () => unsubscribe()
+  }, [onAuthChange])
 
   const handleSignIn = async () => {
     setLoading(true)
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin },
-    })
+    const provider = new GoogleAuthProvider()
+    try {
+      await signInWithPopup(auth, provider)
+    } catch (error) {
+      console.error("Error signing in with Google:", error)
+      setLoading(false)
+    }
   }
 
   const handleSignOut = async () => {
     setLoading(true)
-    await supabase.auth.signOut()
-    setUser(null)
-    setLoading(false)
+    try {
+      await signOut(auth)
+      setUser(null)
+    } catch (error) {
+      console.error("Error signing out:", error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (loading) {
@@ -96,15 +76,15 @@ export function AuthButton({ onAuthChange }: AuthButtonProps) {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={user.user_metadata.avatar_url} alt={user.user_metadata.full_name} />
-              <AvatarFallback>{user.user_metadata.full_name?.charAt(0) || user.email?.charAt(0)}</AvatarFallback>
+              <AvatarImage src={user.photoURL || "/placeholder-user.jpg"} alt={user.displayName || user.email || "User"} />
+              <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Akun Saya</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem disabled>{user.user_metadata.full_name || user.email}</DropdownMenuItem>
+          <DropdownMenuItem disabled>{user.displayName || user.email}</DropdownMenuItem>
           <DropdownMenuItem onClick={handleSignOut}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>Keluar</span>

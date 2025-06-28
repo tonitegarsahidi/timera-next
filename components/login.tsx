@@ -1,25 +1,24 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { getSupabaseClient } from "@/lib/supabase"
 import { User, Loader2 } from "lucide-react"
 import { useState } from "react"
+import { auth } from "@/lib/firebase"
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth"
 
 export function Login() {
   const [loading, setLoading] = useState(false)
-  const supabase = getSupabaseClient()
 
   const handleSignIn = async () => {
     setLoading(true)
-
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth`, // Dinamis, berfungsi di lokal & produksi
-      },
-    })
-
-    // Tidak perlu setLoading(false) karena user akan diarahkan ke halaman lain
+    const provider = new GoogleAuthProvider()
+    try {
+      await signInWithPopup(auth, provider)
+      // Tidak perlu setLoading(false) karena user akan diarahkan ke halaman lain
+    } catch (error) {
+      console.error("Error signing in with Google:", error)
+      setLoading(false) // Set loading ke false jika ada error
+    }
   }
 
   return (
