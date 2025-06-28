@@ -16,7 +16,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { calculatePrayerTimes, type PrayerName } from "@/lib/prayer-times";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ArrowLeft, Upload, X, Minus, Plus, Sun, Moon, Locate } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -342,9 +342,9 @@ export function SettingsContent() {
     });
   };
 
-  const handleAuthChange = (newUser: User | null) => {
+  const handleAuthChange = useCallback((newUser: User | null) => {
     setUser(newUser);
-  };
+  }, []);
 
   return (
     <div className="min-h-screen p-4 md:p-8 islamic-pattern">
@@ -1041,8 +1041,8 @@ export function SettingsContent() {
                         <Image
                           src={String(slide.src) || "/placeholder.svg"} // Memastikan src adalah string
                           alt={`Slide ${index + 1}`}
-                          width={300}
-                          height={200}
+                          width={800}
+                          height={600}
                           className="w-full h-full object-cover"
                         />
                       </div>

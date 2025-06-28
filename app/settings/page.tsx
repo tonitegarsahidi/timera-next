@@ -813,10 +813,10 @@ export function SettingsContentOriginal() {
                     <div key={index} className="relative group">
                       <div className="aspect-video rounded-lg overflow-hidden bg-muted">
                         <Image
-                          src={slide || "/placeholder.svg"}
+                          src={slide?.src || "/placeholder.svg"}
                           alt={`Slide ${index + 1}`}
-                          width={300}
-                          height={200}
+                          width={800}
+                          height={600}
                           className="w-full h-full object-cover"
                         />
                       </div>
