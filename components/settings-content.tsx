@@ -39,6 +39,7 @@ import MapboxMap from "@/components/MapboxMap";
 import { useRouter } from "next/navigation";
 import { commonFonts } from "@/lib/ui-setting";
 import { SlideItem } from "@/lib/db"; // Menambahkan import SlideItem
+import { uploadFileToFirebaseStorage } from "@/lib/firebase"; // Import fungsi upload
 
 // Update the SettingsContent function to include the new fields and functionality
 export function SettingsContent() {
@@ -217,24 +218,22 @@ export function SettingsContent() {
     alert("Pengaturan berhasil disimpan!");
   };
 
-  const handleAddSlide = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAddSlide = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        if (event.target && typeof event.target.result === "string") {
-          // Membuat SlideItem baru dengan ID unik
-          const newSlide: SlideItem = {
-            id: localSlides.length > 0 ? Math.max(...localSlides.map(s => s.id || 0)) + 1 : 1,
-            src: event.target.result,
-            order: localSlides.length,
-          };
-          setLocalSlides([...localSlides, newSlide]);
-        }
-      };
-
-      reader.readAsDataURL(file);
+      const storagePath = `slides/${file.name}_${Date.now()}`; // Path unik di Firebase Storage
+      try {
+        const downloadURL = await uploadFileToFirebaseStorage(file, storagePath);
+        const newSlide: SlideItem = {
+          id: localSlides.length > 0 ? Math.max(...localSlides.map(s => s.id || 0)) + 1 : 1,
+          src: downloadURL,
+          order: localSlides.length,
+        };
+        setLocalSlides([...localSlides, newSlide]);
+      } catch (error) {
+        console.error("Error uploading slide image:", error);
+        alert("Gagal mengunggah gambar slide. Silakan coba lagi.");
+      }
     }
   };
 
@@ -242,21 +241,20 @@ export function SettingsContent() {
     setLocalSlides(localSlides.filter((_, i) => i !== index));
   };
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        if (event.target && typeof event.target.result === "string") {
-          setLocalSettings({
-            ...localSettings,
-            mosqueLogo: event.target.result,
-          });
-        }
-      };
-
-      reader.readAsDataURL(file);
+      const storagePath = `mosque_logos/${file.name}_${Date.now()}`; // Path unik di Firebase Storage
+      try {
+        const downloadURL = await uploadFileToFirebaseStorage(file, storagePath);
+        setLocalSettings({
+          ...localSettings,
+          mosqueLogo: downloadURL,
+        });
+      } catch (error) {
+        console.error("Error uploading mosque logo:", error);
+        alert("Gagal mengunggah logo masjid. Silakan coba lagi.");
+      }
     }
   };
 
